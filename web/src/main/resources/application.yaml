@@ -1,0 +1,48 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: dev   #启用开发环境
+  #数据库配置
+  datasource:
+    driver-class-name: ${draw.datasource.type}
+    url: jdbc:mysql://${draw.datasource.host}:${draw.datasource.port}/${draw.datasource.database}?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
+    username: ${draw.datasource.username}
+    password: ${draw.datasource.password}
+    hikari:
+      connection-test-query: SELECT 1 # 自动检测连接
+      connection-timeout: 60000 #数据库连接超时时间,默认30秒
+      idle-timeout: 500000 #空闲连接存活最大时间，默认600000（10分钟）
+      max-lifetime: 540000 #此属性控制池中连接的最长生命周期，值0表示无限生命周期，默认1800000即30分钟
+      maximum-pool-size: 12 #连接池最大连接数，默认是10
+      minimum-idle: 10 #最小空闲连接数量
+      pool-name: SPHHikariPool # 连接池名称
+  #redis配置
+  data:
+    redis:
+      host: ${draw.redis.host}
+      port: ${draw.redis.port}
+      database: ${draw.redis.database}
+      password: ${draw.redis.password}
+  #jackson配置
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss  # 日期格式
+    time-zone: GMT+8  # 时区
+
+#用于打印框架生成的sql语句，便于调试
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#minio配置
+minio:
+  endpoint: http://${draw.minio.host}:${draw.minio.port}
+  access-key: ${draw.minio.access-key}
+  secret-key: ${draw.minio.secret-key}
+  bucket-name: ${draw.minio.bucket-name}
+
+#swagger配置
+springdoc:
+  default-flat-param-object: true
+
+

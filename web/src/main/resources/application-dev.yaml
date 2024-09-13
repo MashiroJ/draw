@@ -1,0 +1,22 @@
+draw:
+  # redis配置
+  redis:
+    host:
+    port:
+    password:
+    database:
+  #数据库配置
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database:
+    username:
+    password:
+  # minio配置
+  minio:
+    host:
+    port:
+    access-key:
+    secret-key:
+    backet-name:
