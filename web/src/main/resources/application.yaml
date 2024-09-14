@@ -5,7 +5,7 @@ spring:
     active: dev   #启用开发环境
   #数据库配置
   datasource:
-    driver-class-name: ${draw.datasource.type}
+    driver-class-name: ${draw.datasource.driver-class-name}
     url: jdbc:mysql://${draw.datasource.host}:${draw.datasource.port}/${draw.datasource.database}?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=GMT%2b8
     username: ${draw.datasource.username}
     password: ${draw.datasource.password}
@@ -24,10 +24,6 @@ spring:
       port: ${draw.redis.port}
       database: ${draw.redis.database}
       password: ${draw.redis.password}
-  #jackson配置
-  jackson:
-    date-format: yyyy-MM-dd HH:mm:ss  # 日期格式
-    time-zone: GMT+8  # 时区
 
 #用于打印框架生成的sql语句，便于调试
 mybatis-plus:
@@ -35,11 +31,11 @@ mybatis-plus:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 #minio配置
-minio:
-  endpoint: http://${draw.minio.host}:${draw.minio.port}
-  access-key: ${draw.minio.access-key}
-  secret-key: ${draw.minio.secret-key}
-  bucket-name: ${draw.minio.bucket-name}
+#minio:
+#  endpoint: http://${draw.minio.host}:${draw.minio.port}
+#  access-key: ${draw.minio.access-key}
+#  secret-key: ${draw.minio.secret-key}
+#  bucket-name: ${draw.minio.bucket-name}
 
 #swagger配置
 springdoc:
