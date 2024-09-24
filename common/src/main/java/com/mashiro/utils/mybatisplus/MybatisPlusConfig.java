@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
  * MybatisPlus-分页配置类
  */
 @Configuration
-@MapperScan("com.mashiro.mapper")
 public class MybatisPlusConfig {
 
     /**
