@@ -25,20 +25,25 @@ spring:
       database: ${draw.redis.database}
       password: ${draw.redis.password}
 
-#用于打印框架生成的sql语句，便于调试
+
 mybatis-plus:
   configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #用于打印框架生成的sql语句，便于调试
+  global-config:
+    db-config:
+      logic-delete-field: flag # 全局逻辑删除的实体字段名(配置后可以忽略不配置步骤二)
+      logic-delete-value: 1 # 逻辑已删除值(默认为 1)
+      logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
 #minio配置
-#minio:
-#  endpoint: http://${draw.minio.host}:${draw.minio.port}
-#  access-key: ${draw.minio.access-key}
-#  secret-key: ${draw.minio.secret-key}
-#  bucket-name: ${draw.minio.bucket-name}
+minio:
+  endpoint: http://${draw.minio.host}:${draw.minio.port}
+  access-key: ${draw.minio.access-key}
+  secret-key: ${draw.minio.secret-key}
+  bucket-name: ${draw.minio.bucket-name}
 
 #swagger配置
 springdoc:
-  default-flat-param-object: true
+  default-flat-param-object: true   # 默认展开参数
+
 
 
