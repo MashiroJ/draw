@@ -26,9 +26,15 @@ public class Knife4jConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi systemAPI() {
+    public GroupedOpenApi roleAPI() {
         return GroupedOpenApi.builder().group("角色信息管理").
                 pathsToMatch("/system/role/**").
+                build();
+    }
+    @Bean
+    public GroupedOpenApi loginApi() {
+        return GroupedOpenApi.builder().group("登陆相关管理").
+                pathsToMatch("/login/**").
                 build();
     }
 }
