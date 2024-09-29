@@ -46,16 +46,15 @@ CREATE TABLE sys_menu
     id          INT PRIMARY KEY AUTO_INCREMENT COMMENT '菜单ID',
     name        VARCHAR(50) NOT NULL COMMENT '菜单名称',
     path        VARCHAR(255) COMMENT '菜单路径',
-    component   VARCHAR(255) COMMENT '组件',
-    parent_id   INT COMMENT '父菜单ID',
-    menu_type   TINYINT COMMENT '菜单类型：1目录，2菜单，3按钮',
+    parent_id   INT DEFAULT NULL COMMENT '父菜单ID，根菜单为NULL',
     icon        VARCHAR(50) COMMENT '菜单图标',
-    sort_order  INT      DEFAULT 0 COMMENT '排序号',
+    sort_order  INT DEFAULT 0 COMMENT '排序号',
     permission  VARCHAR(100) COMMENT '权限标识',
-    status      TINYINT  DEFAULT 1 COMMENT '菜单状态：1正常，0禁用',
+    status      TINYINT DEFAULT 1 COMMENT '菜单状态：1正常，0禁用',
+    is_visible   TINYINT DEFAULT 1 COMMENT '是否可见：1可见，0不可见',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    is_deleted  TINYINT  DEFAULT 0 COMMENT '是否删除：0未删除，1已删除'
+    is_deleted  TINYINT DEFAULT 0 COMMENT '是否删除：0未删除，1已删除'
 ) COMMENT '系统菜单表';
 
 -- 用户角色关联表
@@ -95,20 +94,20 @@ VALUES ('管理员', '拥有所有权限的角色', 1),
        ('超级管理员', '具备最高权限的管理员角色', 1);
 
 -- 插入测试数据到菜单表
-INSERT INTO sys_menu (name, path, component, parent_id, menu_type, icon, sort_order, permission, status)
-VALUES ('仪表盘', '/dashboard', 'DashboardComponent', NULL, 1, 'dashboard', 1, 'view_dashboard', 1),
-       ('用户管理', '/user', 'UserManagementComponent', NULL, 1, 'users', 2, 'manage_users', 1),
-       ('角色管理', '/role', 'RoleManagementComponent', NULL, 1, 'roles', 2, 'manage_roles', 1),
-       ('设置', '/settings', 'SettingsComponent', NULL, 1, 'settings', 3, 'manage_settings', 1),
-       ('日志', '/logs', 'LogComponent', NULL, 1, 'logs', 4, 'view_logs', 1);
+INSERT INTO sys_menu (name, path, parent_id, icon, sort_order, permission, status, is_visible)
+VALUES
+    ('仪表盘', '/dashboard', NULL, 'dashboard', 1, 'view_dashboard', 1, 1),
+    ('用户管理', '/user', NULL, 'users', 2, 'manage_users', 1, 1),
+    ('角色管理', '/role', NULL, 'roles', 3, 'manage_roles', 1, 1),
+    ('设置', '/settings', NULL, 'settings', 4, 'manage_settings', 1, 1),
+    ('日志', '/logs', NULL, 'logs', 5, 'view_logs', 1, 1);
 
 -- 插入测试数据到用户角色关联表
 INSERT INTO sys_user_role (user_id, role_id)
 VALUES (1, 1), -- 用户1 是 管理员
        (1, 2), -- 用户1 也是 编辑
        (2, 2), -- 用户2 是 编辑
-       (3, 3);
--- 用户3 是 访客
+       (3, 3);  -- 用户3 是 访客
 
 -- 插入测试数据到角色菜单关联表
 INSERT INTO sys_role_menu (role_id, menu_id)
@@ -117,4 +116,3 @@ VALUES (1, 1), -- 管理员 可以访问仪表盘
        (1, 3), -- 管理员 可以访问角色管理
        (2, 2), -- 编辑角色 可以访问用户管理
        (3, 1); -- 访客角色 可以访问仪表盘
-
