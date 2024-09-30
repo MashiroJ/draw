@@ -1,5 +1,7 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.secure.SaSecureUtil;
+import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -46,7 +48,8 @@ public class UserController {
     public Result saveOrUpdate(@RequestBody User user) {
         // 密码加密
         if (user.getPassword() != null) {
-            DigestUtils.md5Hex(user.getPassword());
+            String password = user.getPassword();
+            SaSecureUtil.md5(password);
         }
         userService.saveOrUpdate(user);
         return Result.ok();
