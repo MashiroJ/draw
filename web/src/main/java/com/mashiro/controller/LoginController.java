@@ -32,7 +32,7 @@ public class LoginController {
     @PostMapping("")
     public SaResult login(@RequestBody LoginDto loginDto) {
         loginService.login(loginDto);
-        return SaResult.ok("登录成功");
+        return SaResult.ok(String.valueOf(ResultCodeEnum.SUCCESS));
     }
     @Operation(summary = "是否登录")
     @GetMapping("isLogin")
