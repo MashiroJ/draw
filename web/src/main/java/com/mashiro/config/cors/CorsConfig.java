@@ -1,4 +1,4 @@
-package com.mashiro.config.converter;
+package com.mashiro.config.cors;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
