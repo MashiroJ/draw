@@ -2,6 +2,7 @@ package com.mashiro.mapper;
 
 import com.mashiro.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Mapper;
 
 /**
 * @author mashiro
@@ -9,8 +10,10 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 * @createDate 2024-09-24 22:13:09
 * @Entity com.mashiro.entity.User
 */
+@Mapper
 public interface UserMapper extends BaseMapper<User> {
 
+    User selectOneByUsername(String username);
 }
 
 

@@ -11,11 +11,10 @@ import lombok.Data;
 @TableName(value = "sys_user")
 @Data
 public class User extends BaseEntity {
-
     /**
-     * 手机号，用作登录名
+     * 用户名
      */
-    private String phone;
+    private String username;
 
     /**
      * 密码
@@ -23,9 +22,9 @@ public class User extends BaseEntity {
     private String password;
 
     /**
-     * 用户昵称
+     * 手机号
      */
-    private String nickname;
+    private String phone;
 
     /**
      * 头像URL
@@ -36,5 +35,4 @@ public class User extends BaseEntity {
      * 用户状态：1正常，0禁用
      */
     private Integer status;
-
 }

@@ -26,6 +26,13 @@ public class LoginController {
         return Result.ok(result);
     }
 
+    @Operation(summary = "登录")
+    @PostMapping("")
+    public Result<String> login(@RequestBody LoginDto loginDto) {
+        String jwt =loginService.login(loginDto);
+        return Result.ok(jwt);
+    }
+
 
 
 }

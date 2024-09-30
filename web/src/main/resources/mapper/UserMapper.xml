@@ -6,9 +6,9 @@
 
     <resultMap id="BaseResultMap" type="com.mashiro.entity.User">
             <id property="id" column="id" jdbcType="INTEGER"/>
-            <result property="phone" column="phone" jdbcType="VARCHAR"/>
+            <result property="username" column="username" jdbcType="VARCHAR"/>
             <result property="password" column="password" jdbcType="VARCHAR"/>
-            <result property="nickname" column="nickname" jdbcType="VARCHAR"/>
+            <result property="phone" column="phone" jdbcType="VARCHAR"/>
             <result property="avatarUrl" column="avatar_url" jdbcType="VARCHAR"/>
             <result property="status" column="status" jdbcType="TINYINT"/>
             <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
@@ -17,8 +17,21 @@
     </resultMap>
 
     <sql id="Base_Column_List">
-        id,phone,password,
-        nickname,avatar_url,status,
+        id,username,password,
+        phone,avatar_url,status,
         create_time,update_time,is_deleted
     </sql>
+    <select id="selectOneByUsername" resultType="com.mashiro.entity.User">
+        select id,
+               username,
+               password,
+               phone,
+               avatar_url,
+               status
+        from sys_user
+        where is_deleted = 0
+          and username = #{username}
+
+    </select>
+
 </mapper>
