@@ -1,15 +1,15 @@
 package com.mashiro.service.impl;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.mashiro.constant.RedisConstant;
 import com.mashiro.dto.LoginDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.exception.DrawException;
 import com.mashiro.mapper.UserMapper;
+import com.mashiro.result.Result;
 import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.LoginService;
-import com.mashiro.service.UserService;
-import com.mashiro.utils.Jwt.JwtUtil;
 import com.mashiro.vo.CaptchaVo;
 import com.wf.captcha.SpecCaptcha;
 import jakarta.annotation.Resource;
@@ -38,14 +38,13 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public String login(LoginDto loginDto) {
+    public void login(LoginDto loginDto) {
         // 校验验证码是否存在
         if (loginDto.getCaptchaCode()==null){
             throw new DrawException(ResultCodeEnum.ADMIN_CAPTCHA_CODE_NOT_FOUND);
         }
         // 校验验证码是否过期
         String value = stringRedisTemplate.opsForValue().get(loginDto.getCaptchaKey());
-        System.out.println(value);
         if (value==null){
             throw new DrawException(ResultCodeEnum.ADMIN_CAPTCHA_CODE_EXPIRED);
         }
@@ -64,10 +63,9 @@ public class LoginServiceImpl implements LoginService {
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_DISABLED_ERROR);
         }
         // 校验密码是否正确
-        //if(!user.getPassword().equals(DigestUtils.md5Hex(loginDto.getPassword()))){
         if(!user.getPassword().equals(loginDto.getPassword())){
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_ERROR);
         }
-        return JwtUtil.createToken(user.getId(),user.getUsername());
+        StpUtil.login(user.getId());
     }
 }
