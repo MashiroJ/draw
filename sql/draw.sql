@@ -1,3 +1,4 @@
+
 -- 删除数据库
 DROP DATABASE IF EXISTS draw;
 
@@ -15,12 +16,12 @@ DROP TABLE IF EXISTS sys_role;
 DROP TABLE IF EXISTS sys_user;
 
 -- 用户表
-CREATE TABLE sys_user
+CREATE TABLE `sys_user`
 (
     id          INT PRIMARY KEY AUTO_INCREMENT COMMENT '用户ID',
-    phone       VARCHAR(20) UNIQUE NOT NULL COMMENT '手机号，用作登录名',
+    username    VARCHAR(50) UNIQUE NOT NULL COMMENT '用户名',
     password    VARCHAR(255)       NOT NULL COMMENT '密码',
-    nickname    VARCHAR(50) COMMENT '用户昵称',
+    phone       VARCHAR(20) COMMENT '手机号',
     avatar_url  VARCHAR(255) COMMENT '头像URL',
     status      TINYINT  DEFAULT 1 COMMENT '用户状态：1正常，0禁用',
     create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -80,39 +81,50 @@ CREATE TABLE sys_role_menu
 ) COMMENT '角色菜单关联表';
 
 -- 插入测试数据到用户表
-INSERT INTO sys_user (phone, password, nickname, avatar_url, status)
-VALUES ('13800000001', 'hashed_password_1', '用户1', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1),
-       ('13800000002', 'hashed_password_2', '用户2', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1),
-       ('13800000003', 'hashed_password_3', '用户3', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 0),
-       ('13800000004', 'hashed_password_4', '用户4', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1);
+INSERT INTO sys_user (username, password, phone, avatar_url, status)
+VALUES ('admin', 'hashed_password_admin', '13800000001', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1),
+       ('user1', 'hashed_password_user1', '13800000002', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1),
+       ('member1', 'hashed_password_member1', '13800000003', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1);
 
 -- 插入测试数据到角色表
 INSERT INTO sys_role (name, description, status)
 VALUES ('管理员', '拥有所有权限的角色', 1),
-       ('编辑', '具有编辑权限的角色', 1),
-       ('访客', '仅限查看的角色', 1),
-       ('超级管理员', '具备最高权限的管理员角色', 1);
-
--- 插入测试数据到菜单表
-INSERT INTO sys_menu (name, path, parent_id, icon, sort_order, permission, status, is_visible)
-VALUES
-    ('仪表盘', '/dashboard', NULL, 'dashboard', 1, 'view_dashboard', 1, 1),
-    ('用户管理', '/user', NULL, 'users', 2, 'manage_users', 1, 1),
-    ('角色管理', '/role', NULL, 'roles', 3, 'manage_roles', 1, 1),
-    ('设置', '/settings', NULL, 'settings', 4, 'manage_settings', 1, 1),
-    ('日志', '/logs', NULL, 'logs', 5, 'view_logs', 1, 1);
+       ('普通用户', '具有普通用户权限的角色', 1),
+       ('会员用户', '具有会员权限的角色', 1);
 
 -- 插入测试数据到用户角色关联表
 INSERT INTO sys_user_role (user_id, role_id)
-VALUES (1, 1), -- 用户1 是 管理员
-       (1, 2), -- 用户1 也是 编辑
-       (2, 2), -- 用户2 是 编辑
-       (3, 3);  -- 用户3 是 访客
+VALUES (1, 1), -- 用户1(admin) 是 管理员
+       (2, 2), -- 用户2(user1) 是 普通用户
+       (3, 3); -- 用户3(member1) 是 会员
+
+-- 插入测试数据到菜单表
+INSERT INTO sys_menu (id, name, path, parent_id, icon, sort_order, permission, status, is_visible)
+VALUES
+    (1, '主页', '/home', NULL, 'dashboard', 1, 'view_dashboard', 1, 1),
+    (2, '系统管理', '/system', NULL, 'settings', 2, NULL, 1, 1),
+    (3, '绘画管理', '/draw', NULL, 'brush', 3, NULL, 1, 1),
+    (4, '用户管理', '/user', 2, 'users', 1, 'manage_users', 1, 1),
+    (5, '角色管理', '/role', 2, 'roles', 2, 'manage_roles', 1, 1),
+    (6, '菜单管理', '/menu', 2, 'menu', 3, 'manage_menu', 1, 1),
+    (7, '绘画生成', '/generate', 3, 'brush', 1, 'generate_drawing', 1, 1),
+    (8, '画廊展示', '/gallery', 3, 'image', 2, 'view_gallery', 1, 1);
 
 -- 插入测试数据到角色菜单关联表
 INSERT INTO sys_role_menu (role_id, menu_id)
-VALUES (1, 1), -- 管理员 可以访问仪表盘
-       (1, 2), -- 管理员 可以访问用户管理
-       (1, 3), -- 管理员 可以访问角色管理
-       (2, 2), -- 编辑角色 可以访问用户管理
-       (3, 1); -- 访客角色 可以访问仪表盘
+VALUES (1, 1), -- 管理员角色 可以访问所有菜单
+       (1, 2),
+       (1, 3),
+       (1, 4),
+       (1, 5),
+       (1, 6),
+       (1, 7),
+       (1, 8),
+       (2, 1), -- 普通用户角色 可以访问主页和绘画管理
+       (2, 3),
+       (2, 7),
+       (2, 8),
+       (3, 1), -- 会员角色 可以访问主页和绘画管理
+       (3, 3),
+       (3, 7),
+       (3, 8);

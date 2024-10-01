@@ -27,7 +27,7 @@ public class RoleController {
 
     @Operation(summary = "保存或更新角色")
     @PostMapping("saveOrUpdate")
-    public Result saveRole(Role role) {
+    public Result saveRole(@RequestBody Role role) {
         roleService.saveOrUpdate(role);
         return Result.ok();
     }
