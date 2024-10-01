@@ -21,6 +21,7 @@ public enum ResultCodeEnum {
     ADMIN_CAPTCHA_CODE_ERROR(302, "验证码错误"),
     ADMIN_CAPTCHA_CODE_EXPIRED(303, "验证码已过期"),
     ADMIN_CAPTCHA_CODE_NOT_FOUND(304, "未输入验证码"),
+    ADMIN_PASSWORD_ENCRYPT_ERROR(308, "密码加密失败"),
 
 
     ADMIN_LOGIN_AUTH(305, "未登陆"),

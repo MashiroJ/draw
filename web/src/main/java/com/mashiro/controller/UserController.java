@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.result.Result;
+import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import static com.mashiro.constant.UserConstant.DEFAULT_AVATAR_URL;
+import static com.mashiro.result.ResultCodeEnum.ADMIN_PASSWORD_ENCRYPT_ERROR;
 
 @Tag(name = "用户管理")
 @Slf4j
@@ -48,8 +52,17 @@ public class UserController {
     public Result saveOrUpdate(@RequestBody User user) {
         // 密码加密
         if (user.getPassword() != null) {
-            String password = user.getPassword();
-            SaSecureUtil.md5(password);
+            try {
+                String encryptedPassword = SaSecureUtil.sha256(user.getPassword());
+                user.setPassword(encryptedPassword);
+            } catch (Exception e) {
+                log.error("密码加密失败", e);
+                return Result.error();
+            }
+        }
+        //设置默认头像
+        if (user.getAvatarUrl() ==null) {
+            user.setAvatarUrl(DEFAULT_AVATAR_URL);
         }
         userService.saveOrUpdate(user);
         return Result.ok();

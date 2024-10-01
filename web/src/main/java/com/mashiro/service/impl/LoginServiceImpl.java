@@ -1,5 +1,6 @@
 package com.mashiro.service.impl;
 
+import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import com.mashiro.constant.RedisConstant;
 import com.mashiro.dto.LoginDto;
@@ -63,7 +64,7 @@ public class LoginServiceImpl implements LoginService {
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_DISABLED_ERROR);
         }
         // 校验密码是否正确
-        if(!user.getPassword().equals(loginDto.getPassword())){
+        if(!user.getPassword().equals(SaSecureUtil.sha256(loginDto.getPassword()))){
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_ERROR);
         }
         StpUtil.login(user.getId());
