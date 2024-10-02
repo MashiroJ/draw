@@ -106,4 +106,18 @@ public class UserController {
         userService.update(updateWrapper);
         return Result.ok();
     }
+
+    /**
+     * 更新用户头像
+     */
+    @Operation(summary = "更新用户头像")
+    @PatchMapping("/updateAvatar")
+    public Result updateAvatar(@RequestParam String avatarUrl) {
+        int id = StpUtil.getLoginIdAsInt();
+        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(User::getId, id);
+        updateWrapper.set(User::getAvatarUrl, avatarUrl);
+        userService.update(updateWrapper);
+        return Result.ok();
+    }
 }
