@@ -37,4 +37,10 @@ public class Knife4jConfiguration {
                 pathsToMatch("/login/**").
                 build();
     }
+    @Bean
+    public GroupedOpenApi fileApi() {
+        return GroupedOpenApi.builder().group("文件管理").
+                pathsToMatch("/file/**").
+                build();
+    }
 }
