@@ -95,19 +95,6 @@ public class UserController {
     }
 
     /**
-     * 根据id更新用户状态
-     */
-    @Operation(summary = "更新用户状态")
-    @PostMapping("/updateStatus")
-    public Result updateStatus(@RequestParam long id, @RequestParam BaseStatus status) {
-        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(User::getId, id);
-        updateWrapper.set(User::getStatus, status);
-        userService.update(updateWrapper);
-        return Result.ok();
-    }
-
-    /**
      * 更新用户头像
      */
     @Operation(summary = "更新用户头像")
@@ -117,6 +104,19 @@ public class UserController {
         LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
         updateWrapper.eq(User::getId, id);
         updateWrapper.set(User::getAvatarUrl, avatarUrl);
+        userService.update(updateWrapper);
+        return Result.ok();
+    }
+
+    /**
+     * 根据id更新用户状态
+     */
+    @Operation(summary = "更新用户状态")
+    @PostMapping("/updateStatus")
+    public Result updateStatus(@RequestParam long id, @RequestParam BaseStatus status) {
+        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(User::getId, id);
+        updateWrapper.set(User::getStatus, status);
         userService.update(updateWrapper);
         return Result.ok();
     }
