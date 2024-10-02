@@ -31,6 +31,17 @@ public class UserController {
     @Resource
     private UserService userService;
 
+    /**
+     * 获取用户信息
+     * @return
+     */
+    @Operation(summary = "获取用户信息")
+    @GetMapping("/userInfo")
+    public Result<User> userInfo() {
+        int id = StpUtil.getLoginIdAsInt();
+        User user = userService.getById(id);
+        return Result.ok(user);
+    }
 
     /**
      * 用户分页实现
@@ -47,6 +58,11 @@ public class UserController {
         return Result.ok(result);
     }
 
+    /**
+     * 保存或更新用户信息
+     * @param user
+     * @return
+     */
     @Operation(summary = "保存或更新后台用户信息")
     @PostMapping("saveOrUpdate")
     public Result saveOrUpdate(@RequestBody User user) {
@@ -90,5 +106,4 @@ public class UserController {
         userService.update(updateWrapper);
         return Result.ok();
     }
-
 }

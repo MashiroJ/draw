@@ -55,6 +55,7 @@ public class LoginController {
         loginService.login(loginDto);
         return SaResult.ok(String.valueOf(ResultCodeEnum.SUCCESS));
     }
+
     @Operation(summary = "是否登录")
     @GetMapping("isLogin")
     public SaResult isLogin() {

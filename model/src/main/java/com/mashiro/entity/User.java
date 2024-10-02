@@ -1,5 +1,6 @@
 package com.mashiro.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -19,6 +20,7 @@ public class User extends BaseEntity {
     /**
      * 密码
      */
+    @TableField(select = false)
     private String password;
 
     /**
