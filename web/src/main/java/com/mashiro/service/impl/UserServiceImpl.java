@@ -34,7 +34,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setAvatarUrl(UserConstant.DEFAULT_AVATAR_URL);
         user.setUsername(username);
         user.setPassword(sha256);
-        user.setStatus(BaseStatus.ENABLE.getCode());
+        user.setStatus(BaseStatus.ENABLE);
         userMapper.registerUser(user);
     }
 }

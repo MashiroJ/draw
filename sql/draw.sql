@@ -82,9 +82,9 @@ CREATE TABLE sys_role_menu
 
 -- 插入测试数据到用户表
 INSERT INTO sys_user (username, password, phone, avatar_url, status)
-VALUES ('admin', 'hashed_password_admin', '13800000001', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1),
-       ('user1', 'hashed_password_user1', '13800000002', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1),
-       ('member1', 'hashed_password_member1', '13800000003', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1);
+VALUES ('admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', '13800000001', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1),
+       ('user1', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', '13800000002', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1),
+       ('member1', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918', '13800000003', 'https://avatars.githubusercontent.com/u/46013989?v=4&size=64', 1);
 
 -- 插入测试数据到角色表
 INSERT INTO sys_role (name, description, status)

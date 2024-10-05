@@ -60,7 +60,7 @@ public class LoginServiceImpl implements LoginService {
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_NOT_EXIST_ERROR);
         }
         // 校验账号状态
-        if ((user.getStatus() == BaseStatus.DISABLE.getCode())){
+        if ((user.getStatus() == BaseStatus.DISABLE)){
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_DISABLED_ERROR);
         }
         // 校验密码是否正确

@@ -2,6 +2,7 @@ package com.mashiro.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.mashiro.enums.BaseStatus;
 import lombok.Data;
 
 /**
@@ -36,5 +37,5 @@ public class User extends BaseEntity {
     /**
      * 用户状态：1正常，0禁用
      */
-    private Integer status;
+    private BaseStatus status;
 }

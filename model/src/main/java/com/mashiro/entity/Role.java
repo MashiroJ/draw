@@ -6,6 +6,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import java.io.Serializable;
 import java.util.Date;
+
+import com.mashiro.enums.BaseStatus;
 import lombok.Data;
 
 /**
@@ -29,6 +31,6 @@ public class Role extends BaseEntity {
     /**
      * 角色状态：1正常，0禁用
      */
-    private Integer status;
+    private BaseStatus status;
 
 }
