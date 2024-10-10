@@ -1,7 +1,7 @@
 package com.mashiro.mapper;
 
-import com.mashiro.entity.UserRole;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mashiro.entity.UserRole;
 
 /**
 * @author mashiro

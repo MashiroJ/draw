@@ -1,6 +1,5 @@
 package com.mashiro.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;

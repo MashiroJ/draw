@@ -6,13 +6,10 @@ import com.mashiro.constant.UserConstant;
 import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseStatus;
-import com.mashiro.service.UserService;
 import com.mashiro.mapper.UserMapper;
+import com.mashiro.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
 * @author mashiro

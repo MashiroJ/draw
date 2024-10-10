@@ -2,8 +2,8 @@ package com.mashiro.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mashiro.entity.Menu;
-import com.mashiro.service.MenuService;
 import com.mashiro.mapper.MenuMapper;
+import com.mashiro.service.MenuService;
 import org.springframework.stereotype.Service;
 
 /**

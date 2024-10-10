@@ -16,7 +16,6 @@ import com.mashiro.vo.CaptchaVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import kotlin.jvm.internal.Lambda;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "登录管理")

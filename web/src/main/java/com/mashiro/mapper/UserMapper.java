@@ -1,8 +1,8 @@
 package com.mashiro.mapper;
 
 
-import com.mashiro.entity.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mashiro.entity.User;
 import org.apache.ibatis.annotations.Mapper;
 
 /**

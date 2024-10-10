@@ -1,7 +1,7 @@
 package com.mashiro.mapper;
 
-import com.mashiro.entity.Menu;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.mashiro.entity.Menu;
 
 /**
 * @author mashiro

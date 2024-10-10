@@ -34,8 +34,10 @@ public class RoleController {
 
     @Operation(summary = "删除角色")
     @DeleteMapping("removeById")
-    public Result removeRole(@RequestParam Long id) {
+    public Result removeRole(@RequestParam Integer id) {
         roleService.removeById(id);
         return Result.ok();
     }
+
+    //获取角色所拥有的菜单路径
 }

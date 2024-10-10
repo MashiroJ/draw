@@ -8,13 +8,11 @@ import com.mashiro.entity.User;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.exception.DrawException;
 import com.mashiro.mapper.UserMapper;
-import com.mashiro.result.Result;
 import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.LoginService;
 import com.mashiro.vo.CaptchaVo;
 import com.wf.captcha.SpecCaptcha;
 import jakarta.annotation.Resource;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 

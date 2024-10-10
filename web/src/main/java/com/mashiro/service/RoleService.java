@@ -1,7 +1,7 @@
 package com.mashiro.service;
 
-import com.mashiro.entity.Role;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mashiro.entity.Role;
 
 /**
 * @author mashiro

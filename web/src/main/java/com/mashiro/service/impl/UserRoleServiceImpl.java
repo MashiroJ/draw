@@ -2,8 +2,8 @@ package com.mashiro.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mashiro.entity.UserRole;
-import com.mashiro.service.UserRoleService;
 import com.mashiro.mapper.UserRoleMapper;
+import com.mashiro.service.UserRoleService;
 import org.springframework.stereotype.Service;
 
 /**
