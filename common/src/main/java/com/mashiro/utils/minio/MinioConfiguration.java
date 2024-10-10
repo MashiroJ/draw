@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnProperty(name = "minio.endpoint") // 如果配置了minio.endpoint，则启用该配置类
-@EnableConfigurationProperties(MinioProperties.class)
+@EnableConfigurationProperties(MinioProperties.class) // 启用MinioProperties
 public class MinioConfiguration {
 
     @Resource

@@ -24,8 +24,20 @@ spring:
       port: ${draw.redis.port}
       database: ${draw.redis.database}
       password: ${draw.redis.password}
+      # 连接超时时间
+      timeout: 10s
+      lettuce:
+        pool:
+          # 连接池最大连接数
+          max-active: 200
+          # 连接池最大阻塞等待时间（使用负值表示没有限制）
+          max-wait: -1ms
+          # 连接池中的最大空闲连接
+          max-idle: 10
+          # 连接池中的最小空闲连接
+          min-idle: 0
 
-
+# mybatis-plus配置
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl #用于打印框架生成的sql语句，便于调试
@@ -34,16 +46,22 @@ mybatis-plus:
       logic-delete-field: is_deleted # 全局逻辑删除的实体字段名(配置后可以忽略不配置步骤二)
       logic-delete-value: 1 # 逻辑已删除值(默认为 1)
       logic-not-delete-value: 0 # 逻辑未删除值(默认为 0)
-#minio配置
+# minio配置
 minio:
   endpoint: http://${draw.minio.host}:${draw.minio.port}
   access-key: ${draw.minio.access-key}
   secret-key: ${draw.minio.secret-key}
   bucket-name: ${draw.minio.bucket-name}
 
-#swagger配置
+# swagger配置
 springdoc:
   default-flat-param-object: true   # 默认展开参数
+# sa-token配置
+sa-token:
+  # token 有效期（单位：秒），默认30天，-1代表永不过期
+  timeout: -1
+  # token 最低活跃频率（单位：秒），如果 token 超过此时间没有访问系统就会被冻结，默认-1 代表不限制，永不冻结
+  active-timeout: -1
 
 
 

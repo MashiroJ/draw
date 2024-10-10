@@ -34,13 +34,13 @@ public class Knife4jConfiguration {
     @Bean
     public GroupedOpenApi loginApi() {
         return GroupedOpenApi.builder().group("登陆相关管理").
-                pathsToMatch("/login/**").
+                pathsToMatch("/system/login/**").
                 build();
     }
     @Bean
     public GroupedOpenApi fileApi() {
         return GroupedOpenApi.builder().group("文件管理").
-                pathsToMatch("/file/**").
+                pathsToMatch("/system/file/**").
                 build();
     }
 }

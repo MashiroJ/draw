@@ -9,8 +9,10 @@ import com.mashiro.enums.BaseStatus;
 import com.mashiro.service.UserService;
 import com.mashiro.mapper.UserMapper;
 import jakarta.annotation.Resource;
-import org.springframework.boot.autoconfigure.security.SecurityProperties;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
 * @author mashiro

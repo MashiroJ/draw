@@ -21,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "登录管理")
 @RestController
-@RequestMapping("/login")
+@RequestMapping("/system/login")
 public class LoginController {
 
     @Resource

@@ -17,7 +17,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 @Tag(name = "文件管理")
-@RequestMapping("/file")
+@RequestMapping("/system/file")
 @RestController
 public class FileUploadController {
     @Resource

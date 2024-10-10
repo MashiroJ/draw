@@ -1,5 +1,6 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -9,25 +10,15 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.result.Result;
-import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.FileService;
 import com.mashiro.service.UserService;
-import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.codec.digest.DigestUtils;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 import static com.mashiro.constant.UserConstant.DEFAULT_AVATAR_URL;
-import static com.mashiro.result.ResultCodeEnum.ADMIN_PASSWORD_ENCRYPT_ERROR;
 
 @Tag(name = "用户管理")
 @Slf4j
@@ -50,10 +41,10 @@ public class UserController {
         User user = userService.getById(id);
         return Result.ok(user);
     }
-
     /**
      * 用户分页实现
      */
+
 
     @Operation(summary = "用户分页查询")
     @GetMapping("/page")
@@ -128,19 +119,4 @@ public class UserController {
         userService.update(updateWrapper);
         return Result.ok();
     }
-
-    //更新用户头像
-    @Operation(summary = "更新用户头像")
-    @PostMapping("/updateAvatar")
-    public Result updateAvatar(@RequestParam MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        String url = fileService.upload(file);
-        log.info(url);
-        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
-        updateWrapper.eq(User::getId, StpUtil.getLoginIdAsInt());
-        updateWrapper.set(User::getAvatarUrl, url);
-        userService.update(updateWrapper);
-        return Result.ok();
-    }
-
-
 }
