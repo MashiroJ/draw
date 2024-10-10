@@ -43,4 +43,11 @@ public class Knife4jConfiguration {
                 pathsToMatch("/system/file/**").
                 build();
     }
+
+    @Bean
+    public GroupedOpenApi menuApi() {
+        return GroupedOpenApi.builder().group("菜单管理").
+                pathsToMatch("/system/menu/**").
+                build();
+    }
 }
