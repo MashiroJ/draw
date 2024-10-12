@@ -12,10 +12,16 @@ public class StringToBaseEnumConverterFactory implements ConverterFactory<String
         return new Converter<String, T>() {
             @Override
             public T convert(String source) {
-
                 for (T enumConstant : targetType.getEnumConstants()) {
-                    if (enumConstant.getCode().equals(Integer.valueOf(source))) {
-                        return enumConstant;
+                    try {
+                        if (enumConstant.getName().equalsIgnoreCase(source)) {
+                            return enumConstant;
+                        }
+                        if (enumConstant.getCode().equals(Integer.valueOf(source))) {
+                            return enumConstant;
+                        }
+                    } catch (NumberFormatException e) {
+                        // 忽略数字格式异常
                     }
                 }
                 throw new IllegalArgumentException("非法的枚举值:" + source);
