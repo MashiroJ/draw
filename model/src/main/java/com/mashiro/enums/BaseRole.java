@@ -31,4 +31,13 @@ public enum BaseRole implements BaseEnum {
     public String getName() {
         return this.name;
     }
+
+    public static BaseRole fromCode(Integer code) {
+        for (BaseRole role : values()) {
+            if (role.getCode().equals(code)) {
+                return role;
+            }
+        }
+        return null; // 或者抛出异常，根据业务逻辑调整
+    }
 }

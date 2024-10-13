@@ -35,14 +35,15 @@ public class Result<T> {
         return result;
     }
 
+    public static <T> Result<T> ok() {
+        return Result.ok(null);
+    }
 
     public static <T> Result<T> ok(T data) {
         return build(data, ResultCodeEnum.SUCCESS);
     }
 
-    public static <T> Result<T> ok() {
-        return Result.ok(null);
-    }
+
 
     public static <T> Result<T> error() {
         return build(null, ResultCodeEnum.FAIL);
@@ -51,6 +52,12 @@ public class Result<T> {
     public static <T> Result<T> error(Integer code,String message) {
         Result<T> result = build(null);
         result.setCode(code);
+        result.setMessage(message);
+        return result;
+    }
+
+    public static <T> Result<T> error(String message) {
+        Result<T> result = build(null);
         result.setMessage(message);
         return result;
     }

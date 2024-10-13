@@ -6,8 +6,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.mashiro.dto.GrantRoleDto;
 import com.mashiro.entity.User;
+import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.result.Result;
 import com.mashiro.service.FileService;
@@ -122,15 +122,17 @@ public class UserController {
         return Result.ok();
     }
 
+
     /**
      * 通过用户id授权角色
-     * @param grantRoleDto
+     * @param userId
+     * @param role
      * @return
      */
     @Operation(summary = "通过用户id授权角色")
     @PostMapping("/grantRole")
-    public Result<Void> grantRole(@RequestBody GrantRoleDto grantRoleDto) {
-        userService.grantRole(grantRoleDto);
+    public Result<Void> grantRole(@RequestParam long userId, @RequestParam BaseRole role) {
+        userService.grantRole(userId,role);
         return Result.ok();
     }
     /**
@@ -150,7 +152,12 @@ public class UserController {
     @GetMapping("/getRoleIdsByUserId")
     public Result getRoleIdsByUserId(@RequestParam Long userId) {
         Long roleIdsByUserId = userService.getRoleIdsByUserId(userId);
-        return Result.ok(roleIdsByUserId);
+        BaseRole role = BaseRole.fromCode(roleIdsByUserId.intValue());
+        if (role != null) {
+            return Result.ok(role);
+        } else {
+            return Result.error("无效的角色ID");
+        }
     }
 
     //查询用户所拥有的菜单

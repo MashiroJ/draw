@@ -2,6 +2,7 @@ package com.mashiro.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mashiro.entity.Role;
+import com.mashiro.enums.BaseRole;
 
 /**
 * @author mashiro
@@ -18,6 +19,9 @@ public interface RoleMapper extends BaseMapper<Role> {
     void removeRole(Long userId, Long roleId);
 
     Long getRoleByUserId(Long userId);
+
+
+    void grantRoleByid(long userId, BaseRole role);
 }
 
 

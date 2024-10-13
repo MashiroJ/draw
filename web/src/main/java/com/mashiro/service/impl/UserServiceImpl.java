@@ -1,11 +1,12 @@
 package com.mashiro.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mashiro.constant.UserConstant;
-import com.mashiro.dto.GrantRoleDto;
 import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
+import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.mapper.RoleMapper;
 import com.mashiro.mapper.RoleMenuMapper;
@@ -50,16 +51,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public void grantRole(GrantRoleDto grantRoleDto) {
-        // 删除之前用户所对应的角色数据
-        roleMapper.deleteByUserId(grantRoleDto.getUserId()) ;
-
-        // 分配新的角色数据
-        Long roleId = grantRoleDto.getRoleId();
-        roleMapper.grantRole(grantRoleDto.getUserId(), roleId);
-    }
-
-    @Override
     public void removeRole(Long userId, Long roleId) {
         roleMapper.removeRole(userId, roleId);
     }
@@ -93,6 +84,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         result.put("roleMenuIds" , roleMenuIds) ;
         // 返回
         return result;
+    }
+
+    @Override
+    public void grantRole(long userId, BaseRole role) {
+        // 删除之前用户所对应的角色数据
+        roleMapper.deleteByUserId(userId) ;
+        // 分配新的角色数据
+        roleMapper.grantRoleByid(userId, role);
     }
 
 
