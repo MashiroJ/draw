@@ -6,15 +6,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mashiro.dto.UpdateUserDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
+import com.mashiro.mapper.RoleMapper;
 import com.mashiro.result.Result;
 import com.mashiro.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -29,6 +32,8 @@ public class UserController {
 
     @Resource
     private UserService userService;
+    @Resource
+    private RoleMapper roleMapper;
 
     /**
      * 获取当前登录用户的信息
@@ -61,13 +66,13 @@ public class UserController {
     }
 
     /**
-     * 保存或更新用户信息
+     * 新增用户信息
      * @param user 用户信息对象
      * @return 执行操作的结果
      */
-    @Operation(summary = "保存或更新用户信息")
-    @PostMapping("/saveOrUpdate")
-    public Result saveOrUpdate(@RequestBody User user) {
+    @Operation(summary = "新增用户信息")
+    @PostMapping("/save")
+    public Result save(@RequestBody User user) {
         // 对于非空密码进行加密
         if (user.getPassword() != null) {
             try {
@@ -78,12 +83,42 @@ public class UserController {
                 return Result.error();
             }
         }
-
         // 设置默认头像
-        if (user.getAvatarUrl() == null) {
-            user.setAvatarUrl(DEFAULT_AVATAR_URL);
+        user.setAvatarUrl(DEFAULT_AVATAR_URL);
+        user.setStatus(BaseStatus.ENABLE);
+        // 保存用户
+        if (userService.save(user)) {
+            // 获取新用户的ID
+            Long userId = user.getId();
+            if (userId != null) {
+                log.info("用户信息保存或更新成功，用户ID: {}", userId);
+                roleMapper.grantRoleByid(userId, BaseRole.USER);
+            } else {
+                log.warn("用户ID未能正确获取");
+                return Result.error("用户ID未能正确获取");
+            }
         }
-        userService.saveOrUpdate(user);
+        return Result.ok();
+    }
+
+    /**
+     * 更新用户信息
+     * @param user
+     * @return
+     */
+    @Operation(summary = "更新用户信息")
+    @PatchMapping("/updateUser")
+    @Transactional
+    public Result<Void> updateUser(@RequestBody UpdateUserDto user){
+
+        LambdaUpdateWrapper<User> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
+        lambdaUpdateWrapper.eq(User::getId, user.getId())
+                .set(user.getUsername() != null && !user.getUsername().trim().isEmpty(), User::getUsername, user.getUsername())
+                .set(user.getPhone() != null && !user.getPhone().trim().isEmpty(), User::getPhone, user.getPhone())
+                .set(user.getPassword() != null && !user.getPassword().trim().isEmpty(), User::getPassword, user.getPassword())
+                .set(user.getAvatarUrl() != null && !user.getAvatarUrl().trim().isEmpty(), User::getAvatarUrl, user.getAvatarUrl());
+
+        userService.update(lambdaUpdateWrapper);
         return Result.ok();
     }
 
