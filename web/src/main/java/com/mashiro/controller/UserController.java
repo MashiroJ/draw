@@ -145,6 +145,13 @@ public class UserController {
         userService.removeRole(userId, roleId);
         return Result.ok();
     }
+    // 查询用户所拥有的角色
+    @Operation(summary = "查询用户所拥有的角色")
+    @GetMapping("/getRoleIdsByUserId")
+    public Result getRoleIdsByUserId(@RequestParam Long userId) {
+        Long roleIdsByUserId = userService.getRoleIdsByUserId(userId);
+        return Result.ok(roleIdsByUserId);
+    }
 
     //查询用户所拥有的菜单
     @Operation(summary = "查询用户所拥有的菜单")

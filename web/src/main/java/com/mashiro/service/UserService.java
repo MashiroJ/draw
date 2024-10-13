@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.mashiro.dto.GrantRoleDto;
 import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
-import com.mashiro.enums.BaseRole;
 
 import java.util.Map;
 
@@ -20,5 +19,9 @@ public interface UserService extends IService<User> {
 
     void removeRole(Long userId, Long roleId);
 
+    Long getRoleIdsByUserId(Long userId);
+
     Map<String, Object> getMenuIdsByUserId(Long userId);
+
+
 }

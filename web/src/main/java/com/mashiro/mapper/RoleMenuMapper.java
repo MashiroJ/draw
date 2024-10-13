@@ -13,7 +13,7 @@ import java.util.List;
 */
 public interface RoleMenuMapper extends BaseMapper<RoleMenu> {
 
-    List<Long> findSysRoleMenuByRoleId(Long roleId);
+    List<Long> findSysRoleMenuByRoleId(Long list);
 }
 
 

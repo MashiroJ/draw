@@ -17,7 +17,7 @@ public interface RoleMapper extends BaseMapper<Role> {
 
     void removeRole(Long userId, Long roleId);
 
-    Long getMenuIdsByUserId(Long userId);
+    Long getRoleByUserId(Long userId);
 }
 
 

@@ -17,8 +17,9 @@
         id,role_id,menu_id,
         create_time,update_time,is_deleted
     </sql>
-
-    <select id="findSysRoleMenuByRoleId" resultType="long">
+    <select id="findSysRoleMenuByRoleId" resultType="java.lang.Long">
         select menu_id from sys_role_menu where role_id = #{roleId} and is_deleted = 0
     </select>
+
+
 </mapper>

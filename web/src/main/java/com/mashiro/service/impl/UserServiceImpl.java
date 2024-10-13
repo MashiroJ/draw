@@ -5,15 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mashiro.constant.UserConstant;
 import com.mashiro.dto.GrantRoleDto;
 import com.mashiro.dto.RegisterDto;
-import com.mashiro.entity.Menu;
 import com.mashiro.entity.User;
-import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
-import com.mashiro.mapper.MenuMapper;
 import com.mashiro.mapper.RoleMapper;
 import com.mashiro.mapper.RoleMenuMapper;
 import com.mashiro.mapper.UserMapper;
-import com.mashiro.service.MenuService;
 import com.mashiro.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -70,13 +66,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         roleMapper.removeRole(userId, roleId);
     }
 
+    /**
+     * 通过用户ID获取角色ID
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public Long getRoleIdsByUserId(Long userId) {
+        return roleMapper.getRoleByUserId(userId);
+    }
+
+    /**
+     * 通过用户ID获取菜单ID
+     * @param userId
+     * @return
+     */
+
     @Override
     public Map<String, Object> getMenuIdsByUserId(Long userId) {
         // 通过用户ID获取用户相关联的角色ID
-        Long roleId = roleMapper.getMenuIdsByUserId(userId);
+        Long roleByUserId = roleMapper.getRoleByUserId(userId);
         //通过角色ID获取相关联的菜单
-        // 查询当前角色的菜单数据
-        List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
+        List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleByUserId);
 
         // 将数据存储到Map中进行返回
         Map<String , Object> result = new HashMap<>() ;
@@ -84,6 +96,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 返回
         return result;
     }
+
+
 }
 
 
