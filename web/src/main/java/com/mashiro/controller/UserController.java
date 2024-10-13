@@ -85,6 +85,7 @@ public class UserController {
         }
         // 设置默认头像
         user.setAvatarUrl(DEFAULT_AVATAR_URL);
+        // 设置默认状态为启用
         user.setStatus(BaseStatus.ENABLE);
         // 保存用户
         if (userService.save(user)) {
