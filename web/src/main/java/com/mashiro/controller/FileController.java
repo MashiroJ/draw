@@ -19,7 +19,7 @@ import java.security.NoSuchAlgorithmException;
 @Tag(name = "文件管理")
 @RequestMapping("/system/file")
 @RestController
-public class FileUploadController {
+public class FileController {
     @Resource
     private FileService fileService;
 
