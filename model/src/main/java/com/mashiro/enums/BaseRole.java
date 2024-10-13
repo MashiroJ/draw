@@ -2,6 +2,8 @@ package com.mashiro.enums;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.mashiro.exception.DrawException;
+import com.mashiro.result.ResultCodeEnum;
 
 
 public enum BaseRole implements BaseEnum {
@@ -38,6 +40,6 @@ public enum BaseRole implements BaseEnum {
                 return role;
             }
         }
-        return null; // 或者抛出异常，根据业务逻辑调整
+        throw new DrawException(ResultCodeEnum.PARAM_ERROR);
     }
 }

@@ -16,12 +16,12 @@ public interface RoleMapper extends BaseMapper<Role> {
 
     void grantRole(Long userId, Long roleId);
 
-    void removeRole(Long userId, Long roleId);
+    void removeRole(Long userId, BaseRole roleId);
 
     Long getRoleByUserId(Long userId);
 
 
-    void grantRoleByid(long userId, BaseRole role);
+    void grantRoleByid(long userId, BaseRole roleId);
 }
 
 

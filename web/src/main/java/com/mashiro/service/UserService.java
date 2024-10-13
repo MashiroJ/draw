@@ -16,12 +16,12 @@ public interface UserService extends IService<User> {
     void register(RegisterDto registerDto);
 
 
-    void removeRole(Long userId, Long roleId);
+    void removeRole(Long userId, BaseRole roleId);
 
     Long getRoleIdsByUserId(Long userId);
 
     Map<String, Object> getMenuIdsByUserId(Long userId);
 
 
-    void grantRole(long userId, BaseRole role);
+    void grantRole(long userId, BaseRole roleId);
 }

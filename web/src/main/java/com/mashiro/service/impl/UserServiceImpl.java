@@ -1,7 +1,6 @@
 package com.mashiro.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
-import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mashiro.constant.UserConstant;
 import com.mashiro.dto.RegisterDto;
@@ -51,8 +50,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public void removeRole(Long userId, Long roleId) {
+    public void removeRole(Long userId, BaseRole roleId) {
+        // 取消用户授权角色，为用户授权默认角色
         roleMapper.removeRole(userId, roleId);
+        roleMapper.grantRoleByid(userId, BaseRole.USER);
     }
 
     /**
@@ -87,11 +88,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public void grantRole(long userId, BaseRole role) {
+    public void grantRole(long userId, BaseRole roleId) {
         // 删除之前用户所对应的角色数据
         roleMapper.deleteByUserId(userId) ;
         // 分配新的角色数据
-        roleMapper.grantRoleByid(userId, role);
+        roleMapper.grantRoleByid(userId, roleId);
     }
 
 

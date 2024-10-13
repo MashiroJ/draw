@@ -10,7 +10,6 @@ import com.mashiro.entity.User;
 import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.result.Result;
-import com.mashiro.service.FileService;
 import com.mashiro.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,27 +29,29 @@ public class UserController {
 
     @Resource
     private UserService userService;
-    @Resource
-    private FileService fileService;
+
     /**
-     * 获取用户信息
-     * @return
+     * 获取当前登录用户的信息
+     * @return 包含用户信息的 Result 对象
      */
-    @Operation(summary = "获取用户信息")
+    @Operation(summary = "获取当前登录用户信息")
     @GetMapping("/userInfo")
     public Result<User> userInfo() {
         int id = StpUtil.getLoginIdAsInt();
         User user = userService.getById(id);
         return Result.ok(user);
     }
+
     /**
-     * 用户分页实现
+     * 分页查询用户信息
+     * @param current 当前页码
+     * @param size 每页显示的记录数
+     * @param user 用户查询条件
+     * @return 分页后的用户信息
      */
-
-
-    @Operation(summary = "用户分页查询")
+    @Operation(summary = "分页查询用户信息")
     @GetMapping("/page")
-    private Result<IPage<User>> pageInfo(@RequestParam long current, @RequestParam long size, User user) {
+    public Result<IPage<User>> pageInfo(@RequestParam long current, @RequestParam long size, User user) {
         Page<User> page = new Page<>(current, size);
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(user.getPhone() != null, User::getPhone, user.getPhone());
@@ -61,13 +62,13 @@ public class UserController {
 
     /**
      * 保存或更新用户信息
-     * @param user
-     * @return
+     * @param user 用户信息对象
+     * @return 执行操作的结果
      */
-    @Operation(summary = "保存或更新后台用户信息")
-    @PostMapping("saveOrUpdate")
+    @Operation(summary = "保存或更新用户信息")
+    @PostMapping("/saveOrUpdate")
     public Result saveOrUpdate(@RequestBody User user) {
-        // 密码加密
+        // 对于非空密码进行加密
         if (user.getPassword() != null) {
             try {
                 String encryptedPassword = SaSecureUtil.sha256(user.getPassword());
@@ -77,8 +78,9 @@ public class UserController {
                 return Result.error();
             }
         }
-        //设置默认头像
-        if (user.getAvatarUrl() ==null) {
+
+        // 设置默认头像
+        if (user.getAvatarUrl() == null) {
             user.setAvatarUrl(DEFAULT_AVATAR_URL);
         }
         userService.saveOrUpdate(user);
@@ -86,9 +88,11 @@ public class UserController {
     }
 
     /**
-     * 删除用户
+     * 根据用户ID删除用户
+     * @param id 用户ID
+     * @return 执行操作的结果
      */
-    @Operation(summary = "删除用户")
+    @Operation(summary = "根据用户ID删除用户")
     @DeleteMapping("/deleteById")
     public Result removeUser(@RequestParam long id) {
         userService.removeById(id);
@@ -96,9 +100,11 @@ public class UserController {
     }
 
     /**
-     * 更新用户头像
+     * 更新当前登录用户的头像
+     * @param avatarUrl 新的头像URL
+     * @return 执行操作的结果
      */
-    @Operation(summary = "更新用户头像")
+    @Operation(summary = "更新当前用户头像")
     @PatchMapping("/updateAvatar")
     public Result updateAvatar(@RequestParam String avatarUrl) {
         int id = StpUtil.getLoginIdAsInt();
@@ -110,9 +116,12 @@ public class UserController {
     }
 
     /**
-     * 根据id更新用户状态
+     * 更新用户状态
+     * @param id 用户ID
+     * @param status 新的用户状态
+     * @return 执行操作的结果
      */
-    @Operation(summary = "更新用户状态")
+    @Operation(summary = "更新用户状态信息")
     @PostMapping("/updateStatus")
     public Result updateStatus(@RequestParam long id, @RequestParam BaseStatus status) {
         LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
@@ -122,33 +131,38 @@ public class UserController {
         return Result.ok();
     }
 
-
     /**
-     * 通过用户id授权角色
-     * @param userId
-     * @param role
-     * @return
+     * 为用户分配角色
+     * @param userId 用户ID
+     * @param roleId 要分配的角色
+     * @return 执行操作的结果
      */
-    @Operation(summary = "通过用户id授权角色")
+    @Operation(summary = "为用户分配角色")
     @PostMapping("/grantRole")
-    public Result<Void> grantRole(@RequestParam long userId, @RequestParam BaseRole role) {
-        userService.grantRole(userId,role);
+    public Result<Void> grantRole(@RequestParam long userId, @RequestParam BaseRole roleId) {
+        userService.grantRole(userId, roleId);
         return Result.ok();
     }
+
     /**
-     * 删除用户所授权的角色
-     * @param userId
-     * @param roleId
-     * @return
+     * 删除用户的指定角色
+     * @param userId 用户ID
+     * @param roleId 角色ID
+     * @return 执行操作的结果
      */
-    @Operation(summary = "删除用户所授权的角色")
+    @Operation(summary = "删除用户的指定角色")
     @DeleteMapping("/deleteRole")
-    public Result<Void> deleteRole(@RequestParam Long userId, @RequestParam Long roleId) {
+    public Result<Void> deleteRole(@RequestParam Long userId, @RequestParam BaseRole roleId) {
         userService.removeRole(userId, roleId);
         return Result.ok();
     }
-    // 查询用户所拥有的角色
-    @Operation(summary = "查询用户所拥有的角色")
+
+    /**
+     * 查询用户拥有的角色
+     * @param userId 用户ID
+     * @return 用户拥有的角色信息
+     */
+    @Operation(summary = "查询用户拥有的角色")
     @GetMapping("/getRoleIdsByUserId")
     public Result getRoleIdsByUserId(@RequestParam Long userId) {
         Long roleIdsByUserId = userService.getRoleIdsByUserId(userId);
@@ -160,10 +174,14 @@ public class UserController {
         }
     }
 
-    //查询用户所拥有的菜单
-    @Operation(summary = "查询用户所拥有的菜单")
+    /**
+     * 查询用户拥有的菜单
+     * @param userId 用户ID
+     * @return 用户拥有的菜单信息
+     */
+    @Operation(summary = "查询用户拥有的菜单")
     @GetMapping("/getMenuIdsByUserId")
-    public Result<Map<String,Object>> getMenuIdsByUserId(@RequestParam Long userId) {
+    public Result<Map<String, Object>> getMenuIdsByUserId(@RequestParam Long userId) {
         Map<String, Object> menuIdsByUserId = userService.getMenuIdsByUserId(userId);
         return Result.ok(menuIdsByUserId);
     }
