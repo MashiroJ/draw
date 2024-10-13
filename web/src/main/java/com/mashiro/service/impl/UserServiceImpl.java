@@ -51,14 +51,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Override
     public void grantRole(GrantRoleDto grantRoleDto) {
-        // 删除之前的所有的用户所对应的角色数据
+        // 删除之前用户所对应的角色数据
         roleMapper.deleteByUserId(grantRoleDto.getUserId()) ;
 
         // 分配新的角色数据
-        List<Long> roleIdList = grantRoleDto.getRoleIdList();
-        roleIdList.forEach(roleId->{
-            roleMapper.grantRole(grantRoleDto.getUserId(), roleId);
-        });
+        Long roleId = grantRoleDto.getRoleId();
+        roleMapper.grantRole(grantRoleDto.getUserId(), roleId);
     }
 
     @Override
