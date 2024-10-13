@@ -18,6 +18,8 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 import static com.mashiro.constant.UserConstant.DEFAULT_AVATAR_URL;
 
 @Tag(name = "用户管理")
@@ -120,15 +122,23 @@ public class UserController {
         return Result.ok();
     }
 
-    //通过用户id授权角色
+    /**
+     * 通过用户id授权角色
+     * @param grantRoleDto
+     * @return
+     */
     @Operation(summary = "通过用户id授权角色")
     @PostMapping("/grantRole")
     public Result<Void> grantRole(@RequestBody GrantRoleDto grantRoleDto) {
         userService.grantRole(grantRoleDto);
         return Result.ok();
     }
-
-    //删除用户所授权的角色
+    /**
+     * 删除用户所授权的角色
+     * @param userId
+     * @param roleId
+     * @return
+     */
     @Operation(summary = "删除用户所授权的角色")
     @DeleteMapping("/deleteRole")
     public Result<Void> deleteRole(@RequestParam Long userId, @RequestParam Long roleId) {
@@ -136,5 +146,11 @@ public class UserController {
         return Result.ok();
     }
 
-
+    //查询用户所拥有的菜单
+    @Operation(summary = "查询用户所拥有的菜单")
+    @GetMapping("/getMenuIdsByUserId")
+    public Result<Map<String,Object>> getMenuIdsByUserId(@RequestParam Long userId) {
+        Map<String, Object> menuIdsByUserId = userService.getMenuIdsByUserId(userId);
+        return Result.ok(menuIdsByUserId);
+    }
 }

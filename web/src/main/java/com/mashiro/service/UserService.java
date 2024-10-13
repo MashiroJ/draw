@@ -6,6 +6,8 @@ import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseRole;
 
+import java.util.Map;
+
 /**
 * @author mashiro
 * @description 针对表【sys_user(系统用户表)】的数据库操作Service
@@ -17,4 +19,6 @@ public interface UserService extends IService<User> {
     void grantRole(GrantRoleDto grantRoleDto);
 
     void removeRole(Long userId, Long roleId);
+
+    Map<String, Object> getMenuIdsByUserId(Long userId);
 }

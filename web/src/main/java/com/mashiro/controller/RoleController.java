@@ -2,6 +2,8 @@ package com.mashiro.controller;
 
 import com.mashiro.entity.Role;
 import com.mashiro.result.Result;
+import com.mashiro.result.ResultCodeEnum;
+import com.mashiro.service.RoleMenuService;
 import com.mashiro.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -9,6 +11,7 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "角色管理")
 @RestController
@@ -17,6 +20,8 @@ public class RoleController {
 
     @Resource
     private RoleService roleService;
+    @Resource
+    private RoleMenuService roleMenuService;
 
     @Operation(summary = "获取角色列表")
     @GetMapping("list")
@@ -37,5 +42,14 @@ public class RoleController {
     public Result removeRole(@RequestParam Integer id) {
         roleService.removeById(id);
         return Result.ok();
+    }
+    /**
+     * 查询当前角色所拥有的菜单
+     */
+    @Operation(summary = "查询当前角色所拥有的菜单")
+    @GetMapping("getMenuIdsByRoleId")
+    public Result<Map<String,Object>> getMenuIdsByRoleId(@RequestParam Long roleId) {
+        Map<String , Object> roleMenuByRoleId =roleMenuService.findSysRoleMenuByRoleId(roleId);
+        return Result.ok(roleMenuByRoleId);
     }
 }
