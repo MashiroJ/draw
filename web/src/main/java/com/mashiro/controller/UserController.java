@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mashiro.dto.GrantRoleDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.result.Result;
@@ -118,4 +119,22 @@ public class UserController {
         userService.update(updateWrapper);
         return Result.ok();
     }
+
+    //通过用户id授权角色
+    @Operation(summary = "通过用户id授权角色")
+    @PostMapping("/grantRole")
+    public Result<Void> grantRole(@RequestBody GrantRoleDto grantRoleDto) {
+        userService.grantRole(grantRoleDto);
+        return Result.ok();
+    }
+
+    //删除用户所授权的角色
+    @Operation(summary = "删除用户所授权的角色")
+    @DeleteMapping("/deleteRole")
+    public Result<Void> deleteRole(@RequestParam Long userId, @RequestParam Long roleId) {
+        userService.removeRole(userId, roleId);
+        return Result.ok();
+    }
+
+
 }

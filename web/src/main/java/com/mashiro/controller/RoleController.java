@@ -38,6 +38,4 @@ public class RoleController {
         roleService.removeById(id);
         return Result.ok();
     }
-
-    //获取角色所拥有的菜单路径
 }

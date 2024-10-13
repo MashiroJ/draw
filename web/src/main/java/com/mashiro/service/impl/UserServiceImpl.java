@@ -3,13 +3,18 @@ package com.mashiro.service.impl;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mashiro.constant.UserConstant;
+import com.mashiro.dto.GrantRoleDto;
 import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
+import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
+import com.mashiro.mapper.RoleMapper;
 import com.mashiro.mapper.UserMapper;
 import com.mashiro.service.UserService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author mashiro
@@ -22,6 +27,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     @Resource
     private UserMapper userMapper;
+    @Resource
+    private RoleMapper roleMapper;
     @Override
     public void register(RegisterDto registerDto) {
         // 获取注册的用户名、密码
@@ -35,6 +42,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setPassword(sha256);
         user.setStatus(BaseStatus.ENABLE);
         userMapper.registerUser(user);
+    }
+
+    @Override
+    public void grantRole(GrantRoleDto grantRoleDto) {
+        // 删除之前的所有的用户所对应的角色数据
+        roleMapper.deleteByUserId(grantRoleDto.getUserId()) ;
+
+        // 分配新的角色数据
+        List<Long> roleIdList = grantRoleDto.getRoleIdList();
+        roleIdList.forEach(roleId->{
+            roleMapper.grantRole(grantRoleDto.getUserId(), roleId);
+        });
+    }
+
+    @Override
+    public void removeRole(Long userId, Long roleId) {
+        roleMapper.removeRole(userId, roleId);
     }
 }
 

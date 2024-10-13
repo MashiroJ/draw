@@ -11,6 +11,11 @@ import com.mashiro.entity.Role;
 */
 public interface RoleMapper extends BaseMapper<Role> {
 
+    void deleteByUserId(Long userId);
+
+    void grantRole(Long userId, Long roleId);
+
+    void removeRole(Long userId, Long roleId);
 }
 
 
