@@ -29,6 +29,11 @@ public class LoginController {
     @Resource
     private UserService userService;
 
+    /**
+     * 注册
+     * @param registerDto
+     * @return
+     */
     @Operation(summary = "注册")
     @PostMapping("register")
     public Result<?> register(@RequestBody RegisterDto registerDto){
@@ -41,6 +46,10 @@ public class LoginController {
         return Result.ok();
     }
 
+    /**
+     * 获取验证码
+     * @return
+     */
     @Operation(summary = "获取验证码")
     @GetMapping("/captcha")
     public Result<CaptchaVo> getCaptcha() {
@@ -48,6 +57,11 @@ public class LoginController {
         return Result.ok(result);
     }
 
+    /**
+     * 登录
+     * @param loginDto
+     * @return
+     */
     @Operation(summary = "登录")
     @PostMapping("")
     public SaResult login(@RequestBody LoginDto loginDto) {
@@ -55,18 +69,30 @@ public class LoginController {
         return SaResult.ok(String.valueOf(ResultCodeEnum.SUCCESS));
     }
 
+    /**
+     * 是否登录
+     * @return
+     */
     @Operation(summary = "是否登录")
     @GetMapping("isLogin")
     public SaResult isLogin() {
         return SaResult.ok("是否登录：" + StpUtil.isLogin());
     }
 
+    /**
+     * 获取token信息
+     * @return
+     */
     @Operation(summary = "获取token信息")
     @GetMapping("tokenInfo")
     public SaResult tokenInfo() {
         return SaResult.data(StpUtil.getTokenInfo());
     }
 
+    /**
+     * 退出登录
+     * @return
+     */
     @Operation(summary = "退出登录")
     @PostMapping("logout")
     public SaResult logout() {

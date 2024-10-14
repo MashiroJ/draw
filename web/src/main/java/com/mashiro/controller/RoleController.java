@@ -22,6 +22,10 @@ public class RoleController {
     @Resource
     private RoleMenuService roleMenuService;
 
+    /**
+     * 获取角色列表
+     * @return
+     */
     @Operation(summary = "获取角色列表")
     @GetMapping("list")
     public Result listRole() {
@@ -29,6 +33,11 @@ public class RoleController {
         return Result.ok(list);
     }
 
+    /**
+     * 保存或更新角色
+     * @param role
+     * @return
+     */
     @Operation(summary = "保存或更新角色")
     @PostMapping("saveOrUpdate")
     public Result saveRole(@RequestBody Role role) {
@@ -36,14 +45,22 @@ public class RoleController {
         return Result.ok();
     }
 
+    /**
+     * 删除角色
+     * @param id
+     * @return
+     */
     @Operation(summary = "删除角色")
     @DeleteMapping("removeById")
     public Result removeRole(@RequestParam Integer id) {
         roleService.removeById(id);
         return Result.ok();
     }
+
     /**
      * 查询当前角色所拥有的菜单
+     * @param roleId
+     * @return
      */
     @Operation(summary = "查询当前角色所拥有的菜单")
     @GetMapping("getMenuIdsByRoleId")

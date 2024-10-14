@@ -19,7 +19,11 @@ public class MenuController {
 
     @Resource
     private MenuService menuService;
-    //获取菜单列表
+
+    /**
+     * 获取菜单列表
+     * @return
+     */
     @GetMapping("list")
     @Operation(summary = "获取菜单列表")
     public Result listMenu(){
@@ -27,14 +31,23 @@ public class MenuController {
         return Result.ok(list);
     }
 
-    //保存或更新菜单
+    /**
+     * 添加或更新菜单
+     * @param menu
+     * @return
+     */
     @PostMapping("saveOrUpdate")
     @Operation(summary = "保存或更新菜单")
     public Result saveOrUpdate(@RequestBody Menu menu) {
         menuService.saveOrUpdate(menu);
         return Result.ok();
     }
-    //删除菜单
+
+    /**
+     * 删除菜单
+     * @param id
+     * @return
+     */
     @DeleteMapping("removeById")
     @Operation(summary = "删除菜单")
     public Result removeMenu(@RequestParam Long id) {
