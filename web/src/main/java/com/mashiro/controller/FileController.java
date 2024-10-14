@@ -6,13 +6,15 @@ import io.minio.errors.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
@@ -51,4 +53,40 @@ public class FileController {
         // 返回一个成功的Result对象，包含文件的URL
         return Result.ok(url);
     }
+
+    /**
+     * 删除文件
+     * @param objectName
+     * @return
+     */
+    @DeleteMapping("/delete")
+    public String deleteImage(@RequestParam String objectName) {
+        try {
+            fileService.deleteImage(objectName);
+            return "Image deleted successfully.";
+        } catch (Exception e) {
+            return "Error occurred while deleting the image: " + e.getMessage();
+        }
+    }
+
+    /**
+     * 获取文件流
+     * @param objectName
+     * @return
+     */
+
+    @GetMapping("/view")
+    public ResponseEntity<InputStreamResource> viewFile(@RequestParam String objectName) {
+        try {
+            InputStream fileStream = fileService.getFile(objectName);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .body(new InputStreamResource(fileStream));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(null);
+        }
+    }
+
+
 }

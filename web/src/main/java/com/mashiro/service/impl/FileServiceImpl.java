@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -95,5 +96,43 @@ public class FileServiceImpl implements FileService {
                 .build());
         // 返回文件的访问URL
         return String.join("/", minioProperties.getEndpoint(), minioProperties.getBucketName(), filename);
+    }
+
+    @Override
+    public void deleteImage(String objectName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        // 检查存储桶是否存在
+        boolean bucketExists = minioClient.bucketExists(
+                BucketExistsArgs.builder().bucket(minioProperties.getBucketName()).build()
+        );
+        if (!bucketExists) {
+            throw new IllegalStateException("Bucket does not exist");
+        }
+
+        // 删除对象
+        minioClient.removeObject(
+                RemoveObjectArgs.builder()
+                        .bucket(minioProperties.getBucketName())
+                        .object(objectName)
+                        .build()
+        );
+    }
+
+    @Override
+    public InputStream getFile(String objectName) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+        // 检查存储桶是否存在
+        boolean bucketExists = minioClient.bucketExists(
+                BucketExistsArgs.builder().bucket(minioProperties.getBucketName()).build()
+        );
+        if (!bucketExists) {
+            throw new IllegalStateException("Bucket does not exist");
+        }
+
+        // 获取对象
+        return minioClient.getObject(
+                GetObjectArgs.builder()
+                        .bucket(minioProperties.getBucketName())
+                        .object(objectName)
+                        .build()
+        );
     }
 }
