@@ -2,7 +2,6 @@ package com.mashiro.controller;
 
 import com.mashiro.entity.Role;
 import com.mashiro.result.Result;
-import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.RoleMenuService;
 import com.mashiro.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +48,7 @@ public class RoleController {
     @Operation(summary = "查询当前角色所拥有的菜单")
     @GetMapping("getMenuIdsByRoleId")
     public Result<Map<String,Object>> getMenuIdsByRoleId(@RequestParam Long roleId) {
-        Map<String , Object> roleMenuByRoleId =roleMenuService.findSysRoleMenuByRoleId(roleId);
+        Map<String , Object> roleMenuByRoleId =roleMenuService.getMenuIdsByRoleId(roleId);
         return Result.ok(roleMenuByRoleId);
     }
 }

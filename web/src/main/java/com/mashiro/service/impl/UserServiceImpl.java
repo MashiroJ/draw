@@ -7,13 +7,17 @@ import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
+import com.mashiro.mapper.MenuMapper;
 import com.mashiro.mapper.RoleMapper;
 import com.mashiro.mapper.RoleMenuMapper;
 import com.mashiro.mapper.UserMapper;
 import com.mashiro.service.UserService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,8 +28,9 @@ import java.util.Map;
 * @createDate 2024-09-24 22:13:09
 */
 @Service
+@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
-    implements UserService{
+    implements UserService {
 
     @Resource
     private UserMapper userMapper;
@@ -33,6 +38,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private RoleMapper roleMapper;
     @Resource
     private RoleMenuMapper roleMenuMapper;
+    @Resource
+    private MenuMapper menuMapper;
 
     @Override
     public void register(RegisterDto registerDto) {
@@ -63,40 +70,101 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
      * @return
      */
     @Override
-    public Long getRoleIdsByUserId(Long userId) {
+    public List<Long> getRoleIdsByUserId(Long userId) {
         return roleMapper.getRoleByUserId(userId);
     }
 
     /**
      * 通过用户ID获取菜单ID
+     *
      * @param userId
      * @return
      */
 
     @Override
+    @Transactional
     public Map<String, Object> getMenuIdsByUserId(Long userId) {
         // 通过用户ID获取用户相关联的角色ID
-        Long roleByUserId = roleMapper.getRoleByUserId(userId);
-        //通过角色ID获取相关联的菜单
-        List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleByUserId);
+        List<Long> roleByUserId = roleMapper.getRoleByUserId(userId);
+        log.info("通过用户ID获取用户相关联的角色ID：" + roleByUserId);
 
-        // 将数据存储到Map中进行返回
-        Map<String , Object> result = new HashMap<>() ;
-        result.put("roleMenuIds" , roleMenuIds) ;
-        // 返回
+        // 初始化结果Map
+        Map<String, Object> result = new HashMap<>();
+        List<Long> allRoleMenuIds = new ArrayList<>();
+
+        // 通过角色ID获取相关联的菜单
+        for (Long roleId : roleByUserId) {
+            List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
+            log.info("通过角色ID获取相关联的菜单：" + roleMenuIds);
+            allRoleMenuIds.addAll(roleMenuIds);
+        }
+
+        // 将所有菜单ID存储到Map中进行返回
+        result.put("roleMenuIds", allRoleMenuIds);
         return result;
     }
 
+    /**
+     * 为用户分配角色
+     * @param userId
+     * @param roleId
+     */
+
     @Override
+    @Transactional
     public void grantRole(long userId, BaseRole roleId) {
         // 删除之前用户所对应的角色数据
-        roleMapper.deleteByUserId(userId) ;
+        roleMapper.deleteByUserId(userId);
         // 分配新的角色数据
         roleMapper.grantRoleByid(userId, roleId);
     }
 
+    /**
+     * 通过用户ID获取权限标识
+     * @param userId
+     * @return
+     */
+    @Override
+    public List<String> getPermissionsByUserId(Long userId) {
+        try {
+            // 获取用户关联的角色ID列表
+            List<Long> roleIds = roleMapper.getRoleByUserId(userId);
+            log.debug("获取到的用户角色ID: " + roleIds);
 
+            // 检查角色ID列表是否为空
+            if (roleIds.isEmpty()) {
+                log.warn("用户ID: " + userId + " 关联的角色列表为空");
+                return new ArrayList<>();
+            }
+
+            // 初始化菜单ID列表
+            List<Long> menuIds = new ArrayList<>();
+
+            // 通过角色ID获取菜单ID列表
+            for (Long roleId : roleIds) {
+                List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
+                log.debug("角色ID " + roleId + " 关联的菜单ID: " + roleMenuIds);
+                menuIds.addAll(roleMenuIds);
+            }
+
+            // 检查菜单ID列表是否为空
+            if (menuIds.isEmpty()) {
+                log.warn("用户ID: " + userId + " 关联的菜单列表为空");
+                return new ArrayList<>();
+            }
+
+            // 通过菜单ID列表获取权限标识
+            List<String> permissions = menuMapper.getPermissionsByMenuIds(menuIds);
+            log.debug("获取到的权限标识: " + permissions);
+
+            return permissions;
+        } catch (Exception e) {
+            log.error("获取用户权限时发生错误，用户ID: " + userId, e);
+            throw e; // 或者根据需要处理异常
+        }
+    }
 }
+
 
 
 

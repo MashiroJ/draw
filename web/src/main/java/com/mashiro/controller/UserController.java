@@ -1,7 +1,9 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.util.SaResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.mashiro.constant.UserConstant.DEFAULT_AVATAR_URL;
@@ -201,13 +204,16 @@ public class UserController {
     @Operation(summary = "查询用户拥有的角色")
     @GetMapping("/getRoleIdsByUserId")
     public Result getRoleIdsByUserId(@RequestParam Long userId) {
-        Long roleIdsByUserId = userService.getRoleIdsByUserId(userId);
-        BaseRole role = BaseRole.fromCode(roleIdsByUserId.intValue());
-        if (role != null) {
-            return Result.ok(role);
-        } else {
-            return Result.error("无效的角色ID");
+        List<Long> roleIdsByUserId = userService.getRoleIdsByUserId(userId);
+        // 假设您需要处理每个角色ID
+        for (Long roleId : roleIdsByUserId) {
+            BaseRole role = BaseRole.fromCode(roleId.intValue());
+            if (role != null) {
+                return Result.ok(role);
+            }
         }
+
+        return Result.error("无效的角色ID");
     }
 
     /**
@@ -220,5 +226,11 @@ public class UserController {
     public Result<Map<String, Object>> getMenuIdsByUserId(@RequestParam Long userId) {
         Map<String, Object> menuIdsByUserId = userService.getMenuIdsByUserId(userId);
         return Result.ok(menuIdsByUserId);
+    }
+
+    @Operation(summary = "查询用户拥有的权限")
+    @GetMapping("/getPermissions")
+    public List<String> getPermissions(@RequestParam Long userId) {
+        return userService.getPermissionsByUserId(userId);
     }
 }

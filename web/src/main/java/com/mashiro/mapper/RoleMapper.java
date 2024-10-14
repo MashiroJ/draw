@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mashiro.entity.Role;
 import com.mashiro.enums.BaseRole;
 
+import java.util.List;
+
 /**
 * @author mashiro
 * @description 针对表【sys_role(系统角色表)】的数据库操作Mapper
@@ -18,7 +20,7 @@ public interface RoleMapper extends BaseMapper<Role> {
 
     void removeRole(Long userId, BaseRole roleId);
 
-    Long getRoleByUserId(Long userId);
+    List<Long> getRoleByUserId(Long userId);
 
 
     void grantRoleByid(long userId, BaseRole roleId);

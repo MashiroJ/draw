@@ -1,11 +1,13 @@
 package com.mashiro.controller;
 
 import com.mashiro.entity.Menu;
+import com.mashiro.mapper.MenuMapper;
 import com.mashiro.result.Result;
 import com.mashiro.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

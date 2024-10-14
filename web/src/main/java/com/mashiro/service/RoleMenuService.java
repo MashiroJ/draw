@@ -11,5 +11,7 @@ import java.util.Map;
 * @createDate 2024-09-24 22:13:09
 */
 public interface RoleMenuService extends IService<RoleMenu> {
-    Map<String, Object> findSysRoleMenuByRoleId(Long roleId);
+
+
+    Map<String, Object> getMenuIdsByRoleId(Long roleId);
 }

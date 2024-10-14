@@ -9,7 +9,9 @@ import com.mashiro.service.MenuService;
 import com.mashiro.service.RoleMenuService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,17 +30,18 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu>
     private RoleMenuMapper roleMenuMapper;
 
     @Override
-    public Map<String, Object> findSysRoleMenuByRoleId(Long roleId) {
-        List<Menu> list = menuService.list();
-        // 查询当前角色的菜单数据
-        List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId) ;
+    public Map<String, Object> getMenuIdsByRoleId(Long roleId) {// 通过用户ID获取用户相关联的角色ID
 
-        // 将数据存储到Map中进行返回
-        Map<String , Object> result = new HashMap<>() ;
-        result.put("sysMenuList" , list) ;
-        result.put("roleMenuIds" , roleMenuIds) ;
 
-        // 返回
+        // 存储所有菜单ID
+        List<Long> allRoleMenuIds = new ArrayList<>();
+
+        List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
+        allRoleMenuIds.addAll(roleMenuIds);
+
+        // 初始化结果Map，将所有菜单ID存储到Map中进行返回
+        Map<String, Object> result = new HashMap<>();
+        result.put("roleMenuIds", allRoleMenuIds);
         return result;
     }
 }

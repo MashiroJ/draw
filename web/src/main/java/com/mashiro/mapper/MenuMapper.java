@@ -3,6 +3,8 @@ package com.mashiro.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.mashiro.entity.Menu;
 
+import java.util.List;
+
 /**
 * @author mashiro
 * @description 针对表【sys_menu(系统菜单表)】的数据库操作Mapper
@@ -11,6 +13,7 @@ import com.mashiro.entity.Menu;
 */
 public interface MenuMapper extends BaseMapper<Menu> {
 
+    List<String> getPermissionsByMenuIds(List<Long> roleByUserId);
 }
 
 

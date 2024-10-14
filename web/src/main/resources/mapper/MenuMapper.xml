@@ -25,4 +25,14 @@
         permission,status,is_visible,
         create_time,update_time,is_deleted
     </sql>
+    <select id="getPermissionsByMenuIds" parameterType="java.util.List" resultType="java.lang.String">
+        SELECT permission
+        FROM sys_menu
+        WHERE id IN
+        <foreach item="item" index="index" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+        AND permission IS NOT NULL
+        AND is_deleted = 0
+    </select>
 </mapper>

@@ -5,6 +5,7 @@ import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseRole;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,10 +19,12 @@ public interface UserService extends IService<User> {
 
     void removeRole(Long userId, BaseRole roleId);
 
-    Long getRoleIdsByUserId(Long userId);
+    List<Long> getRoleIdsByUserId(Long userId);
 
     Map<String, Object> getMenuIdsByUserId(Long userId);
 
 
     void grantRole(long userId, BaseRole roleId);
+
+    List<String> getPermissionsByUserId(Long userId);
 }
