@@ -11,6 +11,7 @@ import com.mashiro.mapper.UserMapper;
 import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.LoginService;
 import com.mashiro.vo.CaptchaVo;
+import com.wf.captcha.ArithmeticCaptcha;
 import com.wf.captcha.SpecCaptcha;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,8 +30,15 @@ public class LoginServiceImpl implements LoginService {
 
     @Override
     public CaptchaVo getCaptcha() {
+        ArithmeticCaptcha specCaptcha = new ArithmeticCaptcha(130, 48);
+        specCaptcha.setLen(2);  // 几位数运算，默认是两位
+        specCaptcha.getArithmeticString();  // 获取运算的公式：3+2=?
+        specCaptcha.text();  // 获取运算的结果：5
+        String value = specCaptcha.text().toLowerCase();
+        /*
         SpecCaptcha specCaptcha = new SpecCaptcha(130, 48, 4);
         String value = specCaptcha.text().toLowerCase(); // 获取验证码文本内容
+         */
         String key = RedisConstant.SYSTEM_LOGIN_PREFIX + UUID.randomUUID();   // 生成随机key
         stringRedisTemplate.opsForValue().set(key, value, RedisConstant.SYSTEM_LOGIN_CAPTCHA_TTL_SEC, TimeUnit.SECONDS);
         return new CaptchaVo(specCaptcha.toBase64(), key);

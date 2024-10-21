@@ -58,6 +58,7 @@ public class Result<T> {
 
     public static <T> Result<T> error(String message) {
         Result<T> result = build(null);
+        result.setCode(ResultCodeEnum.FAIL.getCode());
         result.setMessage(message);
         return result;
     }

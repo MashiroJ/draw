@@ -160,6 +160,7 @@ public class UserController {
      * @param status 新的用户状态
      * @return 执行操作的结果
      */
+    @SaCheckRole("管理员")
     @Operation(summary = "更新用户状态信息")
     @PostMapping("/updateStatus")
     public Result updateStatus(@RequestParam long id, @RequestParam BaseStatus status) {
