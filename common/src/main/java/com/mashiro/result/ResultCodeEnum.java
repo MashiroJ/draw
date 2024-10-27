@@ -41,7 +41,7 @@ public enum ResultCodeEnum {
 
 
     TOKEN_EXPIRED(601, "token过期"),
-    TOKEN_INVALID(602, "token非法");
+    TOKEN_INVALID(602, "token非法"), USER_ID_NOT_FOUND(603,"用户id为空" ), USER_REGISTRATION_FAILED(604,"用户注册失败" );
 
 
     private final Integer code;
