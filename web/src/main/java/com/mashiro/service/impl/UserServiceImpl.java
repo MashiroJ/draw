@@ -42,7 +42,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     private MenuMapper menuMapper;
 
     @Override
-    public void register(RegisterDto registerDto) {
+    public User register(RegisterDto registerDto) {
         // 获取注册的用户名、密码
         String username = registerDto.getUsername();
         String password = registerDto.getPassword();
@@ -54,6 +54,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setPassword(sha256);
         user.setStatus(BaseStatus.ENABLE);
         userMapper.registerUser(user);
+        return user;
     }
 
     @Override

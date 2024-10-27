@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.mashiro.dto.LoginDto;
 import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
+import com.mashiro.enums.BaseRole;
 import com.mashiro.exception.DrawException;
+import com.mashiro.mapper.RoleMapper;
 import com.mashiro.result.Result;
 import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.LoginService;
@@ -28,6 +30,8 @@ public class LoginController {
 
     @Resource
     private UserService userService;
+    @Resource
+    private RoleMapper roleMapper;
 
     /**
      * 注册
@@ -36,13 +40,27 @@ public class LoginController {
      */
     @Operation(summary = "注册")
     @PostMapping("register")
-    public Result<?> register(@RequestBody RegisterDto registerDto){
+    public Result<User> register(@RequestBody RegisterDto registerDto){
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getUsername, registerDto.getUsername());
         if (userService.getOne(queryWrapper) != null) {
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_EXIST_ERROR);
         }
-        userService.register(registerDto);
+        if (userService.getOne(queryWrapper) != null) {
+            throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_EXIST_ERROR);
+        }
+
+        User user = userService.register(registerDto);
+        if (user == null) {
+            throw new DrawException(ResultCodeEnum.USER_REGISTRATION_FAILED);
+        }
+
+        Long userId = user.getId();
+        if (userId == null) {
+            throw new DrawException(ResultCodeEnum.USER_ID_NOT_FOUND);
+        }
+
+        roleMapper.grantRoleByid(userId, BaseRole.USER);
         return Result.ok();
     }
 
@@ -65,8 +83,8 @@ public class LoginController {
     @Operation(summary = "登录")
     @PostMapping("")
     public SaResult login(@RequestBody LoginDto loginDto) {
-        loginService.login(loginDto);
-        return SaResult.ok(String.valueOf(ResultCodeEnum.SUCCESS));
+        SaResult login = loginService.login(loginDto);
+        return SaResult.data(login.getData());
     }
 
     /**

@@ -14,7 +14,7 @@ import java.util.Map;
 * @createDate 2024-09-24 22:13:09
 */
 public interface UserService extends IService<User> {
-    void register(RegisterDto registerDto);
+    User register(RegisterDto registerDto);
 
 
     void removeRole(Long userId, BaseRole roleId);

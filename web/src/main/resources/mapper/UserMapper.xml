@@ -21,9 +21,9 @@
         phone,avatar_url,status,
         create_time,update_time,is_deleted
     </sql>
-    <insert id="registerUser">
-            insert into sys_user(username,password,avatar_url,status)
-            values(#{username},#{password},#{avatarUrl},#{status})
+    <insert id="registerUser" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO sys_user (username, password, avatar_url, status)
+        VALUES (#{username}, #{password}, #{avatarUrl}, #{status})
     </insert>
 
     <select id="selectOneByUsername" resultType="com.mashiro.entity.User">

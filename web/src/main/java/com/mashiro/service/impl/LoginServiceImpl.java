@@ -1,7 +1,9 @@
 package com.mashiro.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
+import cn.dev33.satoken.stp.SaTokenInfo;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.dev33.satoken.util.SaResult;
 import com.mashiro.constant.RedisConstant;
 import com.mashiro.dto.LoginDto;
 import com.mashiro.entity.User;
@@ -12,7 +14,6 @@ import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.LoginService;
 import com.mashiro.vo.CaptchaVo;
 import com.wf.captcha.ArithmeticCaptcha;
-import com.wf.captcha.SpecCaptcha;
 import jakarta.annotation.Resource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -45,7 +46,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public void login(LoginDto loginDto) {
+    public SaResult login(LoginDto loginDto) {
         // 校验验证码是否存在
         if (loginDto.getCaptchaCode()==null){
             throw new DrawException(ResultCodeEnum.ADMIN_CAPTCHA_CODE_NOT_FOUND);
@@ -73,6 +74,11 @@ public class LoginServiceImpl implements LoginService {
         if(!user.getPassword().equals(SaSecureUtil.sha256(loginDto.getPassword()))){
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_ERROR);
         }
+        // 第1步，先登录上
         StpUtil.login(user.getId());
+        // 第2步，获取 Token  相关参数
+        SaTokenInfo tokenInfo = StpUtil.getTokenInfo();
+        // 第3步，返回给前端
+        return SaResult.data(tokenInfo);
     }
 }
