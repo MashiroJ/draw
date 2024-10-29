@@ -26,7 +26,7 @@ public class StpInterfaceImpl implements StpInterface {
         List<String> permissions = userService.getPermissionsByUserId(userId);
 
 
-         log.debug("Retrieved permissions for loginId " + loginId + ": " + permissions);
+         log.debug("检索到 loginId 的权限 " + loginId + ": " + permissions);
 
         return permissions == null ? new ArrayList<>() : permissions;
     }
@@ -55,14 +55,14 @@ public class StpInterfaceImpl implements StpInterface {
             try {
                 return Long.parseLong((String) loginId);
             } catch (NumberFormatException e) {
-                throw new IllegalArgumentException("Invalid loginId format: String cannot be parsed to Long", e);
+                throw new IllegalArgumentException("登录 ID 格式无效：字符串无法解析为 Long", e);
             }
         } else if (loginId instanceof Integer) {
             return ((Integer) loginId).longValue();
         } else if (loginId instanceof Number) {
             return ((Number) loginId).longValue();
         } else {
-            throw new IllegalArgumentException("Invalid loginId type: must be a Long, String, Integer, or other Number type");
+            throw new IllegalArgumentException("无效的 loginId 类型：必须是 Long、String、Integer 或其他 Number 类型");
         }
     }
 }
