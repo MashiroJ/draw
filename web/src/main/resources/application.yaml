@@ -3,6 +3,8 @@ server:
 spring:
   profiles:
     active: dev   #启用开发环境
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
   #数据库配置
   datasource:
     driver-class-name: ${draw.datasource.driver-class-name}
@@ -37,6 +39,7 @@ spring:
           # 连接池中的最小空闲连接
           min-idle: 0
 
+
 # mybatis-plus配置
 mybatis-plus:
   configuration:
@@ -52,6 +55,7 @@ minio:
   access-key: ${draw.minio.access-key}
   secret-key: ${draw.minio.secret-key}
   bucket-name: ${draw.minio.bucket-name}
+
 
 # swagger配置
 springdoc:

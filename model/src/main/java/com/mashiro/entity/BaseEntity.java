@@ -1,9 +1,11 @@
 package com.mashiro.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -15,14 +17,16 @@ public class BaseEntity implements Serializable {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
-    @Schema(description = "创建时间")
-    @TableField(value = "create_time",fill = FieldFill.INSERT)
     @JsonIgnore
+    @Schema(description = "创建时间")
+    @TableField(value = "create_time", fill = FieldFill.INSERT)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+0")
     private Date createTime;
 
-    @Schema(description = "更新时间")
-    @TableField(value = "update_time",fill = FieldFill.UPDATE)
     @JsonIgnore
+    @Schema(description = "更新时间")
+    @TableField(value = "update_time", fill = FieldFill.UPDATE)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+0")
     private Date updateTime;
 
     @Schema(description = "逻辑删除")
