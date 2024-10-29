@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.mashiro.constant.UserConstant.DEFAULT_AVATAR_URL;
 
@@ -55,18 +56,50 @@ public class UserController {
      *
      * @param current 当前页码
      * @param size    每页显示的记录数
-     * @param user    用户查询条件
-     * @return 分页后的用户信息
+     * @param user    包含查询条件的用户对象
+     * @return 分页查询结果
      */
     @Operation(summary = "分页查询用户信息")
     @GetMapping("/page")
     public Result<IPage<User>> pageInfo(@RequestParam long current, @RequestParam long size, User user) {
+        // 记录请求参数日志
+        log.info("分页查询用户信息: current={}, size={}, user={}", current, size, user);
+
+        // 创建分页对象
         Page<User> page = new Page<>(current, size);
-        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.like(user.getPhone() != null, User::getPhone, user.getPhone());
-        queryWrapper.eq(user.getStatus() != null, User::getStatus, user.getStatus());
+
+        // 构建查询条件
+        LambdaQueryWrapper<User> queryWrapper = buildQueryWrapper(user);
+
+        // 执行分页查询
         Page<User> result = userService.page(page, queryWrapper);
+
+        // 返回查询结果
         return Result.ok(result);
+    }
+
+    /**
+     * 构建用户查询条件
+     *
+     * @param user 包含查询条件的用户对象
+     * @return 查询条件包装器
+     */
+    private LambdaQueryWrapper<User> buildQueryWrapper(User user) {
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+
+        // 如果用户名不为空，则添加模糊查询条件
+        Optional.ofNullable(user.getUsername())
+                .ifPresent(username -> queryWrapper.like(User::getUsername, username));
+
+        // 如果手机号不为空，则添加模糊查询条件
+        Optional.ofNullable(user.getPhone())
+                .ifPresent(phone -> queryWrapper.like(User::getPhone, phone));
+
+        // 如果状态不为空，则添加精确匹配条件
+        Optional.ofNullable(user.getStatus())
+                .ifPresent(status -> queryWrapper.eq(User::getStatus, status));
+
+        return queryWrapper;
     }
 
     /**

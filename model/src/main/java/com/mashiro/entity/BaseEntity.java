@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
+
 
 import java.io.Serializable;
 import java.util.Date;
@@ -30,7 +30,7 @@ public class BaseEntity implements Serializable {
     private Date updateTime;
 
     @Schema(description = "逻辑删除")
-    @TableField("is_deleted")
+    @TableField("is_deleted") // 指定数据库字段名
     @JsonIgnore // 忽略字段
     @TableLogic // TableLogic注解可以自动为查询操作增加`is_deleted=0`过滤条件，并将删除操作转为更新语句。
     private Byte isDeleted;
