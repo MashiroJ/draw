@@ -3,7 +3,6 @@ package com.mashiro.controller;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.util.SaResult;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -40,6 +39,7 @@ public class UserController {
 
     /**
      * 获取当前登录用户的信息
+     *
      * @return 包含用户信息的 Result 对象
      */
     @Operation(summary = "获取当前登录用户信息")
@@ -52,9 +52,10 @@ public class UserController {
 
     /**
      * 分页查询用户信息
+     *
      * @param current 当前页码
-     * @param size 每页显示的记录数
-     * @param user 用户查询条件
+     * @param size    每页显示的记录数
+     * @param user    用户查询条件
      * @return 分页后的用户信息
      */
     @Operation(summary = "分页查询用户信息")
@@ -70,6 +71,7 @@ public class UserController {
 
     /**
      * 新增用户信息
+     *
      * @param user 用户信息对象
      * @return 执行操作的结果
      */
@@ -107,13 +109,14 @@ public class UserController {
 
     /**
      * 更新用户信息
+     *
      * @param user
      * @return
      */
     @Operation(summary = "更新用户信息")
     @PatchMapping("/updateUser")
     @Transactional
-    public Result<Void> updateUser(@RequestBody UpdateUserDto user){
+    public Result<Void> updateUser(@RequestBody UpdateUserDto user) {
 
         LambdaUpdateWrapper<User> lambdaUpdateWrapper = new LambdaUpdateWrapper<>();
         lambdaUpdateWrapper.eq(User::getId, user.getId())
@@ -128,6 +131,7 @@ public class UserController {
 
     /**
      * 根据用户ID删除用户
+     *
      * @param id 用户ID
      * @return 执行操作的结果
      */
@@ -140,6 +144,7 @@ public class UserController {
 
     /**
      * 更新当前登录用户的头像
+     *
      * @param avatarUrl 新的头像URL
      * @return 执行操作的结果
      */
@@ -156,7 +161,8 @@ public class UserController {
 
     /**
      * 更新用户状态
-     * @param id 用户ID
+     *
+     * @param id     用户ID
      * @param status 新的用户状态
      * @return 执行操作的结果
      */
@@ -173,6 +179,7 @@ public class UserController {
 
     /**
      * 为用户分配角色
+     *
      * @param userId 用户ID
      * @param roleId 要分配的角色
      * @return 执行操作的结果
@@ -186,6 +193,7 @@ public class UserController {
 
     /**
      * 删除用户的指定角色
+     *
      * @param userId 用户ID
      * @param roleId 角色ID
      * @return 执行操作的结果
@@ -199,6 +207,7 @@ public class UserController {
 
     /**
      * 查询用户拥有的角色
+     *
      * @param userId 用户ID
      * @return 用户拥有的角色信息
      */
@@ -219,6 +228,7 @@ public class UserController {
 
     /**
      * 查询用户拥有的菜单
+     *
      * @param userId 用户ID
      * @return 用户拥有的菜单信息
      */
