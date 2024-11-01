@@ -17,7 +17,7 @@ public class Knife4jConfiguration {
                         .version("1.0")
                         .description("Draw项目的接口文档"));
     }
-    
+
     @Bean
     public GroupedOpenApi userAPI() {
         return GroupedOpenApi.builder().group("用户信息管理").
@@ -31,12 +31,14 @@ public class Knife4jConfiguration {
                 pathsToMatch("/system/role/**").
                 build();
     }
+
     @Bean
     public GroupedOpenApi loginApi() {
         return GroupedOpenApi.builder().group("登陆相关管理").
                 pathsToMatch("/system/login/**").
                 build();
     }
+
     @Bean
     public GroupedOpenApi fileApi() {
         return GroupedOpenApi.builder().group("文件管理").
@@ -48,6 +50,13 @@ public class Knife4jConfiguration {
     public GroupedOpenApi menuApi() {
         return GroupedOpenApi.builder().group("菜单管理").
                 pathsToMatch("/system/menu/**").
+                build();
+    }
+
+    @Bean
+    public GroupedOpenApi drawApi() {
+        return GroupedOpenApi.builder().group("绘图管理").
+                pathsToMatch("/system/image/**").
                 build();
     }
 }
