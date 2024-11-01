@@ -127,7 +127,7 @@ public class UserController {
         user.setStatus(BaseStatus.ENABLE);
         // 保存用户
         if (userService.save(user)) {
-            // 获取新用户的ID
+            // 获取新用户的ID,并授权普通角色
             Long userId = user.getId();
             if (userId != null) {
                 log.info("用户信息保存或更新成功，用户ID: {}", userId);
