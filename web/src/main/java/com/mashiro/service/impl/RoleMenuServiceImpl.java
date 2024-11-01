@@ -1,6 +1,8 @@
 package com.mashiro.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.mashiro.entity.Role;
 import com.mashiro.entity.RoleMenu;
 import com.mashiro.mapper.RoleMenuMapper;
 import com.mashiro.service.MenuService;
@@ -40,6 +42,30 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu>
         Map<String, Object> result = new HashMap<>();
         result.put("roleMenuIds", allRoleMenuIds);
         return result;
+    }
+
+    @Override
+    public int insertRoleMenu(Role role) {
+        int rows = 1;
+        // 新增用户与角色管理
+        List<RoleMenu> list = new ArrayList<>();
+        for (int menuId : role.getMenuIds()) {
+            RoleMenu rm = new RoleMenu();
+            rm.setRoleId(Math.toIntExact(role.getId()));
+            rm.setMenuId(menuId);
+            list.add(rm);
+        }
+        if (list.size() > 0) {
+            rows = roleMenuMapper.batchRoleMenu(list);
+        }
+        return rows;
+    }
+
+    @Override
+    public void deleteByRoleId(Long id) {
+        LambdaQueryWrapper<RoleMenu> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(RoleMenu::getRoleId, id);
+        this.remove(queryWrapper);
     }
 }
 

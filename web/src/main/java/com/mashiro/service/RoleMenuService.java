@@ -1,6 +1,7 @@
 package com.mashiro.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.mashiro.entity.Role;
 import com.mashiro.entity.RoleMenu;
 
 import java.util.Map;
@@ -14,4 +15,8 @@ public interface RoleMenuService extends IService<RoleMenu> {
 
 
     Map<String, Object> getMenuIdsByRoleId(Long roleId);
+
+    int insertRoleMenu(Role role);
+
+    void deleteByRoleId(Long id);
 }

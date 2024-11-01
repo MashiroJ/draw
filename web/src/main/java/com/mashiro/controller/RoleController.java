@@ -1,12 +1,14 @@
 package com.mashiro.controller;
 
 import com.mashiro.entity.Role;
+import com.mashiro.enums.BaseStatus;
 import com.mashiro.result.Result;
 import com.mashiro.service.RoleMenuService;
 import com.mashiro.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -35,17 +37,31 @@ public class RoleController {
     }
 
     /**
-     * 保存或更新角色
-     *
+     * 保存或更新角色信息并关联菜单
      * @param role
      * @return
      */
-    @Operation(summary = "保存或更新角色")
+    @Operation(summary = "保存或更新角色信息并关联菜单")
     @PostMapping("saveOrUpdate")
+    @Transactional
     public Result saveRole(@RequestBody Role role) {
-        roleService.saveOrUpdate(role);
+        // 设置默认启用状态
+        role.setStatus(BaseStatus.ENABLE);
+        // 保存或更新角色
+        boolean isSuccess = roleService.saveOrUpdate(role);
+        if (!isSuccess) {
+            return Result.error("角色保存失败");
+        }
+        // 先删除现有的角色菜单关联
+        roleMenuService.deleteByRoleId(role.getId());
+
+        // 插入新的角色菜单关联
+        if (role.getMenuIds() != null) {
+            roleMenuService.insertRoleMenu(role);
+        }
         return Result.ok();
     }
+
 
     /**
      * 删除角色
