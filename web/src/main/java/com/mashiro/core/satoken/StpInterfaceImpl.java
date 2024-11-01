@@ -2,12 +2,12 @@ package com.mashiro.core.satoken;
 
 import cn.dev33.satoken.stp.StpInterface;
 import com.mashiro.enums.BaseRole;
-import com.mashiro.service.RoleMenuService;
 import com.mashiro.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static cn.dev33.satoken.SaManager.log;
 
@@ -26,7 +26,7 @@ public class StpInterfaceImpl implements StpInterface {
         List<String> permissions = userService.getPermissionsByUserId(userId);
 
 
-         log.debug("检索到 loginId 的权限 " + loginId + ": " + permissions);
+        log.debug("检索到 loginId 的权限 " + loginId + ": " + permissions);
 
         return permissions == null ? new ArrayList<>() : permissions;
     }

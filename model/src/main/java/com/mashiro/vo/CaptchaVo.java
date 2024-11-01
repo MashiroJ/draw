@@ -9,9 +9,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class CaptchaVo {
 
-    @Schema(description="验证码图片信息")
+    @Schema(description = "验证码图片信息")
     private String image;
 
-    @Schema(description="验证码key")
+    @Schema(description = "验证码key")
     private String key;
 }

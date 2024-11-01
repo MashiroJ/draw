@@ -2,19 +2,36 @@ package com.mashiro.config.Interceptor;
 
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.stp.StpUtil;
+import com.mashiro.exception.DrawException;
+import com.mashiro.result.ResultCodeEnum;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+
 @Configuration
 public class SaTokenConfigure implements WebMvcConfigurer {
-    // 注册拦截器
+
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 注册 Sa-Token 拦截器，校验规则为 StpUtil.checkLogin() 登录校验。
-        registry.addInterceptor(new SaInterceptor(handle -> StpUtil.checkLogin()))
+        registry.addInterceptor(new SaInterceptor(handle -> {
+                    if (!StpUtil.isLogin()) {
+                        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+                        if (attributes != null) {
+                            HttpServletResponse response = attributes.getResponse();
+                            if (response != null) {
+                                // 未登录，设置状态码为401
+                                response.setStatus(401);
+                            }
+                        }
+                        // 抛出异常以中断请求
+                        throw new DrawException(ResultCodeEnum.ADMIN_LOGIN_AUTH);
+                    }
+                }))
                 .addPathPatterns("/**")
-                .excludePathPatterns("/system/login/**")
-                .excludePathPatterns("/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/swagger-ui/**", "/v3/api-docs/**", "/doc.html");
+                .excludePathPatterns("/system/login/**", "/swagger-ui.html", "/swagger-resources/**", "/webjars/**", "/swagger-ui/**", "/v3/api-docs/**", "/doc.html");
     }
 }

@@ -24,12 +24,12 @@ public enum ResultCodeEnum {
     ADMIN_PASSWORD_ENCRYPT_ERROR(308, "密码加密失败"),
 
 
-    ADMIN_LOGIN_AUTH(305, "未登陆"),
+    ADMIN_LOGIN_AUTH(401, "未登陆"),
     ADMIN_ACCOUNT_NOT_EXIST_ERROR(306, "账号不存在"),
     ADMIN_ACCOUNT_ERROR(307, "用户名或密码错误"),
     ADMIN_ACCOUNT_DISABLED_ERROR(308, "该用户已被禁用"),
     ADMIN_ACCESS_FORBIDDEN(309, "无访问权限"),
-    ADMIN_APARTMENT_DELETE_ERROR(310,"请先删除房间"),
+    ADMIN_APARTMENT_DELETE_ERROR(310, "请先删除房间"),
 
     APP_LOGIN_AUTH(501, "未登陆"),
     APP_LOGIN_PHONE_EMPTY(502, "手机号码为空"),
@@ -41,7 +41,7 @@ public enum ResultCodeEnum {
 
 
     TOKEN_EXPIRED(601, "token过期"),
-    TOKEN_INVALID(602, "token非法"), USER_ID_NOT_FOUND(603,"用户id为空" ), USER_REGISTRATION_FAILED(604,"用户注册失败" );
+    TOKEN_INVALID(602, "token非法"), USER_ID_NOT_FOUND(603, "用户id为空"), USER_REGISTRATION_FAILED(604, "用户注册失败");
 
 
     private final Integer code;

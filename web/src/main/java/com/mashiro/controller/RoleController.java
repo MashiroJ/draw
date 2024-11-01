@@ -24,6 +24,7 @@ public class RoleController {
 
     /**
      * 获取角色列表
+     *
      * @return
      */
     @Operation(summary = "获取角色列表")
@@ -35,6 +36,7 @@ public class RoleController {
 
     /**
      * 保存或更新角色
+     *
      * @param role
      * @return
      */
@@ -47,6 +49,7 @@ public class RoleController {
 
     /**
      * 删除角色
+     *
      * @param id
      * @return
      */
@@ -59,13 +62,14 @@ public class RoleController {
 
     /**
      * 查询当前角色所拥有的菜单
+     *
      * @param roleId
      * @return
      */
     @Operation(summary = "查询当前角色所拥有的菜单")
     @GetMapping("getMenuIdsByRoleId")
-    public Result<Map<String,Object>> getMenuIdsByRoleId(@RequestParam Long roleId) {
-        Map<String , Object> roleMenuByRoleId =roleMenuService.getMenuIdsByRoleId(roleId);
+    public Result<Map<String, Object>> getMenuIdsByRoleId(@RequestParam Long roleId) {
+        Map<String, Object> roleMenuByRoleId = roleMenuService.getMenuIdsByRoleId(roleId);
         return Result.ok(roleMenuByRoleId);
     }
 }

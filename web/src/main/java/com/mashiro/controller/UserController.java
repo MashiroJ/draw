@@ -251,9 +251,7 @@ public class UserController {
         // 假设您需要处理每个角色ID
         for (Long roleId : roleIdsByUserId) {
             BaseRole role = BaseRole.fromCode(roleId.intValue());
-            if (role != null) {
-                return Result.ok(role);
-            }
+            return Result.ok(role);
         }
 
         return Result.error("无效的角色ID");

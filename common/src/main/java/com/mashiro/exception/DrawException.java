@@ -1,7 +1,6 @@
 package com.mashiro.exception;
 
 import com.mashiro.result.ResultCodeEnum;
-import com.mashiro.result.ResultCodeEnum;
 import lombok.Data;
 
 /**
@@ -12,10 +11,10 @@ import lombok.Data;
  * @Description: 定义异常
  **/
 @Data
-public class DrawException extends RuntimeException{
+public class DrawException extends RuntimeException {
     private Integer code;
 
-    public DrawException(ResultCodeEnum resultCodeEnum){
+    public DrawException(ResultCodeEnum resultCodeEnum) {
         super(resultCodeEnum.getMessage());
         this.code = resultCodeEnum.getCode();
     }

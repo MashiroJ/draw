@@ -2,7 +2,6 @@ package com.mashiro.dto;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.mashiro.entity.BaseEntity;
-import com.mashiro.enums.BaseStatus;
 import lombok.Data;
 
 @Data

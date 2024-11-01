@@ -1,20 +1,15 @@
 package com.mashiro.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import java.io.Serializable;
-import java.util.Date;
-
 import com.mashiro.enums.BaseStatus;
 import lombok.Data;
 
 /**
  * 系统角色表
+ *
  * @TableName sys_role
  */
-@TableName(value ="sys_role")
+@TableName(value = "sys_role")
 @Data
 public class Role extends BaseEntity {
 

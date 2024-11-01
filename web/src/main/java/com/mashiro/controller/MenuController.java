@@ -1,13 +1,11 @@
 package com.mashiro.controller;
 
 import com.mashiro.entity.Menu;
-import com.mashiro.mapper.MenuMapper;
 import com.mashiro.result.Result;
 import com.mashiro.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,17 +20,19 @@ public class MenuController {
 
     /**
      * 获取菜单列表
+     *
      * @return
      */
     @GetMapping("list")
     @Operation(summary = "获取菜单列表")
-    public Result listMenu(){
+    public Result listMenu() {
         List<Menu> list = menuService.list();
         return Result.ok(list);
     }
 
     /**
      * 添加或更新菜单
+     *
      * @param menu
      * @return
      */
@@ -45,6 +45,7 @@ public class MenuController {
 
     /**
      * 删除菜单
+     *
      * @param id
      * @return
      */

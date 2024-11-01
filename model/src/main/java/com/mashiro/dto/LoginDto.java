@@ -7,15 +7,15 @@ import lombok.Data;
 @Schema(description = "后台管理系统登录信息")
 public class LoginDto {
 
-    @Schema(description="用户名")
+    @Schema(description = "用户名")
     private String username;
 
-    @Schema(description="密码")
+    @Schema(description = "密码")
     private String password;
 
-    @Schema(description="验证码key")
+    @Schema(description = "验证码key")
     private String captchaKey;
 
-    @Schema(description="验证码code")
+    @Schema(description = "验证码code")
     private String captchaCode;
 }

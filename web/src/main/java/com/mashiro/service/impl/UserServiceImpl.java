@@ -23,14 +23,14 @@ import java.util.List;
 import java.util.Map;
 
 /**
-* @author mashiro
-* @description 针对表【sys_user(系统用户表)】的数据库操作Service实现
-* @createDate 2024-09-24 22:13:09
-*/
+ * @author mashiro
+ * @description 针对表【sys_user(系统用户表)】的数据库操作Service实现
+ * @createDate 2024-09-24 22:13:09
+ */
 @Service
 @Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User>
-    implements UserService {
+        implements UserService {
 
     @Resource
     private UserMapper userMapper;
@@ -107,6 +107,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 为用户分配角色
+     *
      * @param userId
      * @param roleId
      */
@@ -122,6 +123,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
     /**
      * 通过用户ID获取权限标识
+     *
      * @param userId
      * @return
      */

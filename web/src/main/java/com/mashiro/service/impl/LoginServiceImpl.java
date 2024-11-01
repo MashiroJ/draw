@@ -20,12 +20,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+
 @Service
 public class LoginServiceImpl implements LoginService {
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
-    
+
     @Resource
     private UserMapper userMapper;
 
@@ -48,30 +49,30 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public SaResult login(LoginDto loginDto) {
         // 校验验证码是否存在
-        if (loginDto.getCaptchaCode()==null){
+        if (loginDto.getCaptchaCode() == null) {
             throw new DrawException(ResultCodeEnum.ADMIN_CAPTCHA_CODE_NOT_FOUND);
         }
         // 校验验证码是否过期
         String value = stringRedisTemplate.opsForValue().get(loginDto.getCaptchaKey());
-        if (value==null){
+        if (value == null) {
             throw new DrawException(ResultCodeEnum.ADMIN_CAPTCHA_CODE_EXPIRED);
         }
         // 校验验证码是否正确
-        if (!value.equals(loginDto.getCaptchaCode().toLowerCase())){
+        if (!value.equals(loginDto.getCaptchaCode().toLowerCase())) {
             throw new DrawException(ResultCodeEnum.ADMIN_CAPTCHA_CODE_ERROR);
         }
 
         // 校验账号是否存在
-        User user  = userMapper.selectOneByUsername(loginDto.getUsername());
-        if (user ==null){
+        User user = userMapper.selectOneByUsername(loginDto.getUsername());
+        if (user == null) {
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_NOT_EXIST_ERROR);
         }
         // 校验账号状态
-        if ((user.getStatus() == BaseStatus.DISABLE)){
+        if ((user.getStatus() == BaseStatus.DISABLE)) {
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_DISABLED_ERROR);
         }
         // 校验密码是否正确
-        if(!user.getPassword().equals(SaSecureUtil.sha256(loginDto.getPassword()))){
+        if (!user.getPassword().equals(SaSecureUtil.sha256(loginDto.getPassword()))) {
             throw new DrawException(ResultCodeEnum.ADMIN_ACCOUNT_ERROR);
         }
         // 第1步，先登录上

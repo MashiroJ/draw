@@ -5,12 +5,12 @@
 <mapper namespace="com.mashiro.mapper.RoleMenuMapper">
 
     <resultMap id="BaseResultMap" type="com.mashiro.entity.RoleMenu">
-            <id property="id" column="id" jdbcType="INTEGER"/>
-            <result property="roleId" column="role_id" jdbcType="INTEGER"/>
-            <result property="menuId" column="menu_id" jdbcType="INTEGER"/>
-            <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
-            <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
+        <id property="id" column="id" jdbcType="INTEGER"/>
+        <result property="roleId" column="role_id" jdbcType="INTEGER"/>
+        <result property="menuId" column="menu_id" jdbcType="INTEGER"/>
+        <result property="createTime" column="create_time" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="update_time" jdbcType="TIMESTAMP"/>
+        <result property="isDeleted" column="is_deleted" jdbcType="TINYINT"/>
     </resultMap>
 
     <sql id="Base_Column_List">
@@ -18,7 +18,10 @@
         create_time,update_time,is_deleted
     </sql>
     <select id="findSysRoleMenuByRoleId" resultType="java.lang.Long">
-        select menu_id from sys_role_menu where role_id = #{roleId} and is_deleted = 0
+        select menu_id
+        from sys_role_menu
+        where role_id = #{roleId}
+          and is_deleted = 0
     </select>
 
 

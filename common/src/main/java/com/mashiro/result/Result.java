@@ -44,12 +44,11 @@ public class Result<T> {
     }
 
 
-
     public static <T> Result<T> error() {
         return build(null, ResultCodeEnum.FAIL);
     }
 
-    public static <T> Result<T> error(Integer code,String message) {
+    public static <T> Result<T> error(Integer code, String message) {
         Result<T> result = build(null);
         result.setCode(code);
         result.setMessage(message);

@@ -27,13 +27,12 @@ public class FileController {
 
     /**
      * /**
-     *  上传文件方法
-     *  该方法负责接收上传的文件，并返回文件的URL
+     * 上传文件方法
+     * 该方法负责接收上传的文件，并返回文件的URL
      *
-     *  @param file 通过@RequestParam注解接收的上传文件，直接从请求中获取
-     * @return 返回一个Result对象，包含文件的URL
-     *
+     * @param file 通过@RequestParam注解接收的上传文件，直接从请求中获取
      * @param file
+     * @return 返回一个Result对象，包含文件的URL
      * @return
      * @throws ServerException
      * @throws InsufficientDataException
@@ -56,6 +55,7 @@ public class FileController {
 
     /**
      * 删除文件
+     *
      * @param objectName
      * @return
      */
@@ -71,6 +71,7 @@ public class FileController {
 
     /**
      * 获取文件流
+     *
      * @param objectName
      * @return
      */

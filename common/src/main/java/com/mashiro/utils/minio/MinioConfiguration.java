@@ -2,7 +2,6 @@ package com.mashiro.utils.minio;
 
 import io.minio.MinioClient;
 import jakarta.annotation.Resource;
-import lombok.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

@@ -18,8 +18,10 @@ import com.mashiro.vo.CaptchaVo;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @Tag(name = "登录管理")
 @RestController
 @RequestMapping("/system/login")
@@ -35,12 +37,13 @@ public class LoginController {
 
     /**
      * 注册
+     *
      * @param registerDto
      * @return
      */
     @Operation(summary = "注册")
     @PostMapping("register")
-    public Result<User> register(@RequestBody RegisterDto registerDto){
+    public Result<User> register(@RequestBody RegisterDto registerDto) {
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getUsername, registerDto.getUsername());
         if (userService.getOne(queryWrapper) != null) {
@@ -66,6 +69,7 @@ public class LoginController {
 
     /**
      * 获取验证码
+     *
      * @return
      */
     @Operation(summary = "获取验证码")
@@ -77,6 +81,7 @@ public class LoginController {
 
     /**
      * 登录
+     *
      * @param loginDto
      * @return
      */
@@ -84,11 +89,13 @@ public class LoginController {
     @PostMapping("")
     public SaResult login(@RequestBody LoginDto loginDto) {
         SaResult login = loginService.login(loginDto);
-        return SaResult.data(login.getData());
+        log.info("登录结果：{}", login);
+        return SaResult.ok().setData(login);
     }
 
     /**
      * 是否登录
+     *
      * @return
      */
     @Operation(summary = "是否登录")
@@ -99,6 +106,7 @@ public class LoginController {
 
     /**
      * 获取token信息
+     *
      * @return
      */
     @Operation(summary = "获取token信息")
@@ -109,6 +117,7 @@ public class LoginController {
 
     /**
      * 退出登录
+     *
      * @return
      */
     @Operation(summary = "退出登录")
