@@ -1,5 +1,6 @@
 package com.mashiro.controller;
 
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mashiro.entity.Role;
 import com.mashiro.enums.BaseStatus;
 import com.mashiro.result.Result;
@@ -38,6 +39,7 @@ public class RoleController {
 
     /**
      * 保存或更新角色信息并关联菜单
+     *
      * @param role
      * @return
      */
@@ -59,6 +61,16 @@ public class RoleController {
         if (role.getMenuIds() != null) {
             roleMenuService.insertRoleMenu(role);
         }
+        return Result.ok();
+    }
+
+    @Operation(summary = "更新角色状态")
+    @PostMapping("updateStatus")
+    public Result updateStatus(@RequestParam long id, @RequestParam BaseStatus status) {
+        LambdaUpdateWrapper<Role> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(Role::getId, id);
+        updateWrapper.set(Role::getStatus, status);
+        roleService.update(updateWrapper);
         return Result.ok();
     }
 
