@@ -7,17 +7,21 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.mashiro.dto.UpdatePasswordDto;
 import com.mashiro.dto.UpdateUserDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
+import com.mashiro.exception.DrawException;
 import com.mashiro.mapper.RoleMapper;
 import com.mashiro.result.Result;
+import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
+import org.simpleframework.xml.core.Validate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -270,9 +274,56 @@ public class UserController {
         return Result.ok(menuIdsByUserId);
     }
 
+    /**
+     * 查询用户拥有的权限
+     *
+     * @param userId
+     * @return
+     */
     @Operation(summary = "查询用户拥有的权限")
     @GetMapping("/getPermissions")
     public List<String> getPermissions(@RequestParam Long userId) {
         return userService.getPermissionsByUserId(userId);
+    }
+
+    /**
+     * 修改当前用户的密码
+     * @param updatePasswordDto
+     * @return
+     */
+    @Operation(summary = "修改当前用户的密码")
+    @PostMapping("/updatePassword")
+    public Result updatePassword(@RequestBody @Validate UpdatePasswordDto updatePasswordDto) {
+        // 获取用户输入的原始密码、新密码和确认密码
+        String oldPassword = updatePasswordDto.getOldPassword();
+        String newPassword = updatePasswordDto.getNewPassword();
+        String confirmPassword = updatePasswordDto.getConfirmPassword();
+
+        // 获取当前登录用户的信息，并显式包含密码字段
+        long loginId = StpUtil.getLoginIdAsLong();
+        LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(User::getId, loginId)
+                .select(User::getId, User::getPassword); // 显式选择需要的字段
+        User user = userService.getOne(queryWrapper);
+
+        // 判断用户是否存在
+        if (user == null) {
+            throw new DrawException(ResultCodeEnum.USER_NOT_FOUND);
+        }
+
+        // 判断旧密码是否正确
+        if (!user.getPassword().equals(SaSecureUtil.sha256(oldPassword))) {
+            throw new DrawException(ResultCodeEnum.ADMIN_PASSWORD_ERROR);
+        }
+
+        // 判断新密码和确认密码是否一致
+        if (!newPassword.equals(confirmPassword)) {
+            throw new DrawException(ResultCodeEnum.PASSWORD_MISMATCH);
+        }
+
+        String sha256Password = SaSecureUtil.sha256(newPassword);
+        user.setPassword(sha256Password);
+        userService.updateById(user);
+        return Result.ok();
     }
 }
