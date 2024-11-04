@@ -5,6 +5,13 @@ spring:
     active: dev   #启用开发环境
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+  comfyui:
+    host: 127.0.0.1 # 主机地址 默认127.0.0.1
+    port: 8188  # comfyui端口号 默认8188
+    client-id: 1723799429
+    auto-clear-task: true # 提交绘图任务时，如果Comfyui内部有非当前服务提交的任务时是否自动取消
+    queue:
+      type: thread
   #数据库配置
   datasource:
     driver-class-name: ${draw.datasource.driver-class-name}
