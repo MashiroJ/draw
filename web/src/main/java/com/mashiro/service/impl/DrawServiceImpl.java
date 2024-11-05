@@ -13,7 +13,6 @@ import com.mashiro.utils.TaskProcessMonitor.TaskProcessMonitor;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -39,6 +38,7 @@ public class DrawServiceImpl implements DrawService {
 
     /**
      * 获取默认工作流
+     *
      * @return
      */
     public ComfyWorkFlow getFlow() {
@@ -57,6 +57,7 @@ public class DrawServiceImpl implements DrawService {
 
     /**
      * 提交文生图任务
+     *
      * @param drawDto
      */
     @Override
@@ -89,6 +90,7 @@ public class DrawServiceImpl implements DrawService {
 
     /**
      * 根据TaskId查看图片
+     *
      * @param taskId
      * @return
      */
