@@ -53,6 +53,14 @@ public class FileController {
         return Result.ok(url);
     }
 
+    // 通过 URL 上传文件接口
+    @Operation(summary = "通过URL上传文件")
+    @PostMapping("/uploadByUrl")
+    public Result<String> uploadByUrl(@RequestParam String fileUrl) {
+        String url = fileService.uploadFromUrl(fileUrl);
+        return Result.ok(url);
+    }
+
     /**
      * 删除文件
      *

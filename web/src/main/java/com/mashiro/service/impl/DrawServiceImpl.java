@@ -7,6 +7,7 @@ import com.comfyui.queue.common.IDrawingTaskSubmit;
 import com.mashiro.dto.DrawDto;
 import com.mashiro.result.Result;
 import com.mashiro.service.DrawService;
+import com.mashiro.service.FileService;
 import com.mashiro.utils.ComfyUi.ComfyUiProperties;
 import com.mashiro.utils.TaskProcessMonitor.TaskProcessMonitor;
 import jakarta.annotation.Resource;
@@ -33,6 +34,8 @@ public class DrawServiceImpl implements DrawService {
     private TaskProcessMonitor taskProcessMonitor;
     @Resource
     private ComfyUiProperties comfyUiProperties;
+    @Resource
+    private FileService fileService;
 
     /**
      * 获取默认工作流
@@ -96,7 +99,8 @@ public class DrawServiceImpl implements DrawService {
         String fileName = taskProcessMonitor.getTaskOutputFileName(taskId);
 
         if (fileName != null) {
-            String url = "http://" + host + ":" + port + "/view?filename=" + fileName + "&type=output&preview=WEBP";
+            String fileUrl = "http://" + host + ":" + port + "/view?filename=" + fileName + "&type=output&preview=WEBP";
+            String url = fileService.uploadFromUrl(fileUrl);
             return Result.ok(url);
         } else {
             return Result.error("未找到对应任务的输出文件名");
