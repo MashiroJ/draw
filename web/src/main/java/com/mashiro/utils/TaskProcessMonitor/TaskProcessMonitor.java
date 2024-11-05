@@ -5,9 +5,15 @@ import com.comfyui.monitor.message.receiver.ITaskProcessReceiver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 @Slf4j
 @Component
 public class TaskProcessMonitor implements ITaskProcessReceiver {
+
+    // 用于存储任务ID和输出文件名的映射关系
+    private final Map<String, String> taskOutputMap = new ConcurrentHashMap<>();
 
     /**
      * 任务开始
@@ -16,7 +22,7 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
      */
     @Override
     public void taskStart(ComfyTaskStart start) {
-        log.info("任务开始, 任务id:{}", start.getTaskId());
+        log.info("任务开始, 任务id:{},ComfyUi任务ID：{}", start.getTaskId(), start.getComfyTaskId());
     }
 
     /**
@@ -56,7 +62,15 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
      */
     @Override
     public void taskComplete(ComfyTaskComplete complete) {
-        log.info("任务完成, 任务id: {}, 内部任务id: {}", complete.getTaskId(), complete.getComfyTaskId());
+        log.info("任务完成, 任务id: {}, 内部任务id: {},图片预览：{}",
+                complete.getTaskId(),
+                complete.getComfyTaskId(),
+                complete.getImages());
+        // 将任务id和对应的文件名存储到taskOutputMap中
+        if (complete.getImages() != null && !complete.getImages().isEmpty()) {
+            String outputFileName = complete.getImages().get(0).getFileName();
+            taskOutputMap.put(complete.getTaskId(), outputFileName);
+        }
     }
 
     /**
@@ -75,7 +89,8 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
      * @param taskNumber 队列任务信息
      */
     @Override
-    public void taskNumberUpdate(ComfyTaskNumber taskNumber) {}
+    public void taskNumberUpdate(ComfyTaskNumber taskNumber) {
+    }
 
     /**
      * 当前系统负载
@@ -83,5 +98,16 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
      * @param performance 系统状态
      */
     @Override
-    public void systemPerformance(ComfySystemPerformance performance) {}
+    public void systemPerformance(ComfySystemPerformance performance) {
+    }
+
+    /**
+     * 获取任务输出文件名
+     *
+     * @param taskId 任务ID
+     * @return 文件名
+     */
+    public String getTaskOutputFileName(String taskId) {
+        return taskOutputMap.get(taskId);
+    }
 }
