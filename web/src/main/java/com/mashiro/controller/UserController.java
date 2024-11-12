@@ -303,7 +303,7 @@ public class UserController {
         long loginId = StpUtil.getLoginIdAsLong();
         LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(User::getId, loginId)
-                .select(User::getId, User::getPassword); // 显式选择需要的字段
+                .select(User::getId, User::getPassword); // 指定要查询的字段
         User user = userService.getOne(queryWrapper);
 
         // 判断用户是否存在
