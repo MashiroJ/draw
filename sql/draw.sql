@@ -91,54 +91,26 @@ DROP TABLE IF EXISTS `draw_param`;
 DROP TABLE IF EXISTS `draw_like`;
 
 -- 创建绘画记录表
-CREATE TABLE `draw_record`
+CREATE TABLE draw_record
 (
-    `id`              bigint                                  NOT NULL AUTO_INCREMENT COMMENT '绘画记录ID',
-    `user_id`         int                                     NOT NULL COMMENT '创建用户ID',
-    `prompt`          text COLLATE utf8mb4_unicode_ci         NOT NULL COMMENT '绘画提示词',
-    `negative_prompt` text COLLATE utf8mb4_unicode_ci COMMENT '反向提示词',
-    `image_url`       varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '生成图片URL',
-    `thumbnail_url`   varchar(255) COLLATE utf8mb4_unicode_ci COMMENT '缩略图URL',
-    `generation_type` varchar(20) COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '生成类型：TEXT2IMG/IMG2IMG',
-    `status`          varchar(20) COLLATE utf8mb4_unicode_ci  NOT NULL DEFAULT 'PENDING' COMMENT '状态：PENDING/PROCESSING/COMPLETED/FAILED',
-    `error_message`   text COLLATE utf8mb4_unicode_ci COMMENT '错误信息',
-    `like_count`      int                                              DEFAULT '0' COMMENT '点赞数',
-    `is_public`       tinyint                                          DEFAULT '1' COMMENT '是否公开：1公开，0私有',
-    `create_time`     datetime                                         DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`     datetime                                         DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `is_deleted`      tinyint                                          DEFAULT '0' COMMENT '是否删除：0未删除，1已删除',
-    PRIMARY KEY (`id`),
-    KEY `idx_user_id` (`user_id`),
-    KEY `idx_create_time` (`create_time`),
-    KEY `idx_status` (`status`)
+    id              BIGINT AUTO_INCREMENT COMMENT '绘画记录ID'
+        PRIMARY KEY,
+    user_id         INT NOT NULL COMMENT '创建用户ID',
+    task_id          VARCHAR(255) NULL COMMENT '任务ID',
+    prompt          TEXT NOT NULL COMMENT '绘画提示词',
+    negative_prompt TEXT NULL COMMENT '反向提示词',
+    image_url       VARCHAR(255) NOT NULL COMMENT '生成图片URL',
+    generation_type VARCHAR(20) NOT NULL COMMENT '生成类型：TEXT2IMG/IMG2IMG',
+    work_flow_name  VARCHAR(255) NOT NULL COMMENT '工作流名称',
+    like_count      INT DEFAULT 0 NULL COMMENT '点赞数',
+    is_public       TINYINT DEFAULT 1 NULL COMMENT '是否公开：1公开，0私有',
+    create_time     DATETIME DEFAULT CURRENT_TIMESTAMP NULL COMMENT '创建时间',
+    update_time     DATETIME DEFAULT CURRENT_TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    is_deleted      TINYINT DEFAULT 0 NULL COMMENT '是否删除：0未删除，1已删除'
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4
   COLLATE = utf8mb4_unicode_ci COMMENT ='绘画记录表';
 
--- 创建绘画参数表
-CREATE TABLE `draw_param`
-(
-    `id`                 bigint                                  NOT NULL AUTO_INCREMENT COMMENT '参数ID',
-    `draw_id`            bigint                                  NOT NULL COMMENT '绘画记录ID',
-    `workflow_id`        varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '工作流ID',
-    `seed`               bigint COMMENT '随机种子',
-    `steps`              int COMMENT '步数',
-    `cfg_scale`          decimal(5, 2) COMMENT 'CFG Scale',
-    `width`              int COMMENT '图片宽度',
-    `height`             int COMMENT '图片高度',
-    `model_name`         varchar(100) COLLATE utf8mb4_unicode_ci COMMENT '模型名称',
-    `sampler_name`       varchar(50) COLLATE utf8mb4_unicode_ci COMMENT '采样器名称',
-    `orig_image_url`     varchar(255) COLLATE utf8mb4_unicode_ci COMMENT '原始图片URL(用于IMG2IMG)',
-    `denoising_strength` decimal(5, 2) COMMENT '降噪强度(用于IMG2IMG)',
-    `extra_params`       json COMMENT '其他参数(JSON格式)',
-    `create_time`        datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time`        datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `is_deleted`         tinyint  DEFAULT '0' COMMENT '是否删除：0未删除，1已删除',
-    PRIMARY KEY (`id`),
-    KEY `idx_draw_id` (`draw_id`)
-) ENGINE = InnoDB
-  DEFAULT CHARSET = utf8mb4
-  COLLATE = utf8mb4_unicode_ci COMMENT ='绘画参数表';
 
 -- 创建点赞记录表
 CREATE TABLE `draw_like`
@@ -230,19 +202,6 @@ VALUES (1, 1, 1, NULL, NULL, 0),
        (11, 2, 4, NULL, NULL, 0),
        (12, 2, 5, NULL, NULL, 0),
        (13, 3, 6, NULL, NULL, 0);
-
-
-INSERT INTO `draw_record` (`user_id`, `prompt`, `negative_prompt`, `image_url`, `generation_type`, `status`,
-                           `like_count`)
-VALUES (1, 'a beautiful landscape with mountains and lake', 'ugly, blurry', 'https://example.com/images/1.png',
-        'TEXT2IMG', 'COMPLETED', 5),
-       (2, 'portrait of a girl with blue hair', 'bad quality', 'https://example.com/images/2.png', 'TEXT2IMG',
-        'COMPLETED', 3);
-
-INSERT INTO `draw_param` (`draw_id`, `workflow_id`, `seed`, `steps`, `cfg_scale`, `width`, `height`, `model_name`,
-                          `sampler_name`)
-VALUES (1, 'default_landscape', 12345, 20, 7.5, 512, 512, 'sd_xl_base_1.0', 'euler_a'),
-       (2, 'default_portrait', 67890, 30, 8.0, 512, 768, 'sd_xl_base_1.0', 'dpm++_2m');
 
 INSERT INTO `draw_like` (`draw_id`, `user_id`)
 VALUES (1, 2),

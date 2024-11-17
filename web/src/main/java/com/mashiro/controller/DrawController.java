@@ -2,6 +2,7 @@ package com.mashiro.controller;
 
 import com.comfyui.common.entity.ComfyWorkFlow;
 import com.mashiro.dto.DrawDto;
+import com.mashiro.enums.BaseFlowWork;
 import com.mashiro.result.Result;
 import com.mashiro.service.DrawService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,8 +22,8 @@ public class DrawController {
 
     @GetMapping("getFlow")
     @Operation(summary = "获取默认工作流")
-    public Result getFlow() {
-        ComfyWorkFlow flow = drawService.getFlow();
+    public Result getFlow(String workFlowName) {
+        ComfyWorkFlow flow = drawService.getFlow(workFlowName);
         return Result.ok(flow);
     }
 
@@ -34,9 +35,9 @@ public class DrawController {
      */
     @Operation(summary = "提交任务")
     @PostMapping("text2img")
-    public Result text2img(@RequestBody DrawDto drawDto) {
-        drawService.text2img(drawDto);
-        return Result.ok();
+    public Result<String> text2img(DrawDto drawDto ,@RequestParam BaseFlowWork baseFlowWork) throws InterruptedException {
+        String stringResult = String.valueOf(drawService.text2img(drawDto,baseFlowWork));
+        return Result.ok(stringResult);
     }
 
     @Operation(summary = "查看图片")
