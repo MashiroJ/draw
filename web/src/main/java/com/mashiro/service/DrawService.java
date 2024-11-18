@@ -2,7 +2,6 @@ package com.mashiro.service;
 
 import com.comfyui.common.entity.ComfyWorkFlow;
 import com.mashiro.dto.DrawDto;
-import com.mashiro.enums.BaseFlowWork;
 import com.mashiro.result.Result;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -14,7 +13,7 @@ public interface DrawService {
     ComfyWorkFlow getFlow(String workFlowName);
 
 
-    String text2img(DrawDto drawDto, BaseFlowWork baseFlowWork);
+    String text2img(DrawDto drawDto);
 
-    String img2img(DrawDto drawDto, MultipartFile uploadImage, BaseFlowWork baseFlowWork);
+    String img2img(DrawDto drawDto, MultipartFile uploadImage);
 }

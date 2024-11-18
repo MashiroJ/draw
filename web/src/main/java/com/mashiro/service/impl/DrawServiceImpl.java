@@ -38,8 +38,8 @@ import static com.mashiro.constant.UserConstant.DEFAULT_TASK_ID;
 @Service
 public class DrawServiceImpl implements DrawService {
 
-    private static final int TASK_WAIT_TIME = 20000; // 10 seconds
-    private static final int TASK_TIMEOUT = 5; // 5 minutes
+    private static final int TASK_WAIT_TIME = 20000; // 20秒
+    private static final int TASK_TIMEOUT = 5; // 5分钟
 
     @Resource
     private IDrawingTaskSubmit taskSubmit;
@@ -81,8 +81,8 @@ public class DrawServiceImpl implements DrawService {
     /**
      * 查看图片
      *
-     * @param taskId
-     * @return
+     * @param taskId 任务ID
+     * @return 图片URL
      */
     @Override
     public Result<String> viewImg(String taskId) {
@@ -101,17 +101,22 @@ public class DrawServiceImpl implements DrawService {
     }
 
     @Override
-    public String text2img(DrawDto drawDto, BaseFlowWork baseFlowWork) {
+    public String text2img(DrawDto drawDto) {
         validateDrawRequest(drawDto);
+        String prompt = drawDto.getPrompt();
 
         String taskId = generateTaskId();
         int loginUserId = StpUtil.getLoginIdAsInt();
         log.info("用户ID: {}, 提交任务，任务ID: {}", loginUserId, taskId);
 
         try {
-            ComfyWorkFlow flow = prepareWorkFlow(baseFlowWork);
+
+            BaseFlowWork baseFlowWork = BaseFlowWork.TEXT2IMG;
+            ComfyWorkFlow flow = prepareWorkFlow(baseFlowWork,prompt);
             String negativePrompt = submitDrawingTask(flow, taskId);
             String imageUrl = processTaskResult(taskId);
+
+            // 保存绘图记录
             saveDrawRecord(drawDto, negativePrompt, imageUrl, loginUserId, taskId, baseFlowWork);
             return imageUrl;
         } catch (InterruptedException e) {
@@ -124,8 +129,9 @@ public class DrawServiceImpl implements DrawService {
     }
 
     @Override
-    public String img2img(DrawDto drawDto, MultipartFile uploadImage, BaseFlowWork baseFlowWork) {
+    public String img2img(DrawDto drawDto, MultipartFile uploadImage) {
         validateImg2ImgRequest(drawDto, uploadImage);
+        String prompt = drawDto.getPrompt();
 
         String taskId = generateTaskId();
         int loginUserId = StpUtil.getLoginIdAsInt();
@@ -135,10 +141,13 @@ public class DrawServiceImpl implements DrawService {
             // 处理上传图片
             String uploadedImagePath = handleUploadedImage(uploadImage, taskId);
 
-            // 准备工作流
-            ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath);
+            // 将工作流写死为 IMG2IMG
+            BaseFlowWork baseFlowWork = BaseFlowWork.IMG2IMG;
+            ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath,prompt);
             String negativePrompt = submitDrawingTask(flow, taskId);
             String imageUrl = processTaskResult(taskId);
+
+            // 保存绘图记录
             saveDrawRecord(drawDto, negativePrompt, imageUrl, loginUserId, taskId, baseFlowWork);
             return imageUrl;
         } catch (InterruptedException e) {
@@ -177,8 +186,9 @@ public class DrawServiceImpl implements DrawService {
         }
     }
 
-    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork, String uploadedImagePath) {
+    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork, String uploadedImagePath, String prompt) {
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
+        log.info("获取图生图工作流: {}", flow);
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
@@ -193,6 +203,8 @@ public class DrawServiceImpl implements DrawService {
 
         // 配置随机种子
         configureRandomSeed(flow);
+        ComfyWorkFlowNode node18 = flow.getNode(18);
+        node18.getInputs().put("text",prompt);
         return flow;
     }
 
@@ -209,12 +221,22 @@ public class DrawServiceImpl implements DrawService {
         return String.valueOf(StpUtil.getLoginIdAsInt() + DEFAULT_TASK_ID);
     }
 
-    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork) {
+    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork, String prompt) {
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
+        log.info("获取文生图工作流: {}", flow);
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
+        //
+        ComfyWorkFlowNode node10 = flow.getNode("10");
+        if (node10 != null) {
+            node10.getInputs().put("text",prompt);
+        }else{
+            log.warn("工作流中未找到ID为 '10' 的节点");
+        }
+
         configureRandomSeed(flow);
+        log.info("获取修改后的文生图工作流: {}", flow);
         return flow;
     }
 
@@ -229,7 +251,7 @@ public class DrawServiceImpl implements DrawService {
 
     private String submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
         ComfyWorkFlowNode node7 = flow.getNode("7");
-        String negativePrompt = node7 != null ? (String) node7.getInputs().get("text") : "";
+        String negativePrompt = (String) node7.getInputs().get("text");
 
         DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
         taskSubmit.submit(drawingTaskInfo);
@@ -267,7 +289,17 @@ public class DrawServiceImpl implements DrawService {
             drawRecord.setTaskId(taskId);
             drawRecord.setPrompt(drawDto.getPrompt());
             drawRecord.setNegativePrompt(negativePrompt);
-            drawRecord.setGenerationType("TEXT2IMG");
+
+            // 根据 baseFlowWork 设置生成类型
+            String generationType;
+            if (baseFlowWork == BaseFlowWork.TEXT2IMG) {
+                generationType = "TEXT2IMG";
+            } else if (baseFlowWork == BaseFlowWork.IMG2IMG) {
+                generationType = "IMG2IMG";
+            } else {
+                generationType = "DEFAULT";
+            }
+            drawRecord.setGenerationType(generationType);
             drawRecord.setWorkFlowName(baseFlowWork);
             drawRecord.setIsPublic(drawDto.getIsPublic());
             drawRecord.setImageUrl(imageUrl);

@@ -43,15 +43,15 @@ public class DrawController {
      */
     @Operation(summary = "文生图")
     @PostMapping("text2img")
-    public Result<String> text2img(DrawDto drawDto, @RequestParam BaseFlowWork baseFlowWork) {
-        String text2imgUrl = drawService.text2img(drawDto, baseFlowWork);
+    public Result<String> text2img(DrawDto drawDto) {
+        String text2imgUrl = drawService.text2img(drawDto);
         return Result.ok(text2imgUrl);
     }
 
     @Operation(summary = "图生图")
     @PostMapping("img2img")
-    public Result<String> img2img(DrawDto drawDto, @RequestParam BaseFlowWork baseFlowWork, @RequestPart(required = false) MultipartFile uploadImage) {
-        String img2imgUrl = drawService.img2img(drawDto,uploadImage, baseFlowWork);
+    public Result<String> img2img(DrawDto drawDto, @RequestPart(required = false) MultipartFile uploadImage) {
+        String img2imgUrl = drawService.img2img(drawDto,uploadImage);
         return Result.ok(img2imgUrl);
     }
 
