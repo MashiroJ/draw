@@ -43,7 +43,7 @@ public class DrawController {
      */
     @Operation(summary = "文生图")
     @PostMapping("text2img")
-    public Result<String> text2img(DrawDto drawDto, @RequestParam BaseFlowWork baseFlowWork) throws InterruptedException {
+    public Result<String> text2img(DrawDto drawDto, @RequestParam BaseFlowWork baseFlowWork) {
         String text2imgUrl = drawService.text2img(drawDto, baseFlowWork);
         return Result.ok(text2imgUrl);
     }

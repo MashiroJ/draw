@@ -14,7 +14,7 @@ public interface DrawService {
     ComfyWorkFlow getFlow(String workFlowName);
 
 
-    String text2img(DrawDto drawDto, BaseFlowWork baseFlowWork) throws InterruptedException;
+    String text2img(DrawDto drawDto, BaseFlowWork baseFlowWork);
 
     String img2img(DrawDto drawDto, MultipartFile uploadImage, BaseFlowWork baseFlowWork);
 }
