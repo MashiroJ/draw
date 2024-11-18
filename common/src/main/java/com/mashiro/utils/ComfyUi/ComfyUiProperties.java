@@ -9,4 +9,5 @@ public class ComfyUiProperties {
     private String host;
     private String port;
     private String clientId;
+    private String InputPath;
 }

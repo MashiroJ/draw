@@ -21,10 +21,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -52,6 +56,7 @@ public class DrawServiceImpl implements DrawService {
 
     /**
      * 获取指定工作流
+     *
      * @param workFlowName 工作流名称
      * @return 工作流对象
      */
@@ -75,6 +80,7 @@ public class DrawServiceImpl implements DrawService {
 
     /**
      * 查看图片
+     *
      * @param taskId
      * @return
      */
@@ -115,6 +121,79 @@ public class DrawServiceImpl implements DrawService {
             log.error("文生图失败，userId: {}, taskId: {}", loginUserId, taskId, e);
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
+    }
+
+    @Override
+    public String img2img(DrawDto drawDto, MultipartFile uploadImage, BaseFlowWork baseFlowWork) {
+        validateImg2ImgRequest(drawDto, uploadImage);
+
+        String taskId = generateTaskId();
+        int loginUserId = StpUtil.getLoginIdAsInt();
+        log.info("用户ID: {}, 提交图生图任务，任务ID: {}", loginUserId, taskId);
+
+        try {
+            // 处理上传图片
+            String uploadedImagePath = handleUploadedImage(uploadImage, taskId);
+
+            // 准备工作流
+            ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath);
+            String negativePrompt = submitDrawingTask(flow, taskId);
+            String imageUrl = processTaskResult(taskId);
+            saveDrawRecord(drawDto, negativePrompt, imageUrl, loginUserId, taskId, baseFlowWork);
+            return imageUrl;
+        } catch (InterruptedException e) {
+            log.error("图生图任务执行被中断，userId: {}, taskId: {}", loginUserId, taskId, e);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        } catch (Exception e) {
+            log.error("图生图失败，userId: {}, taskId: {}", loginUserId, taskId, e);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
+    }
+
+    private void validateImg2ImgRequest(DrawDto drawDto, MultipartFile uploadImage) {
+        if (!StringUtils.hasText(drawDto.getPrompt())) {
+            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
+        }
+        if (uploadImage == null || uploadImage.isEmpty()) {
+            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
+        }
+    }
+
+    private String handleUploadedImage(MultipartFile uploadImage, String taskId) {
+        try {
+            String originalFilename = uploadImage.getOriginalFilename();
+            String fileExtension = StringUtils.getFilenameExtension(originalFilename);
+            String savedFileName = taskId + "." + fileExtension;
+
+            // 保存上传的图片到指定目录
+            Path destinationPath = Paths.get(comfyUiProperties.getInputPath(), savedFileName);
+            Files.createDirectories(destinationPath.getParent());
+            uploadImage.transferTo(destinationPath.toFile());
+
+            return savedFileName;
+        } catch (IOException e) {
+            log.error("图片上传处理失败", e);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
+    }
+
+    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork, String uploadedImagePath) {
+        ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
+        if (flow == null) {
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
+
+        // 更新工作流中的图片加载节点
+        ComfyWorkFlowNode node10 = flow.getNode("10");
+        if (node10 != null) {
+            node10.getInputs().put("image", uploadedImagePath);
+        } else {
+            log.warn("工作流中未找到ID为 '10' 的图片加载节点");
+        }
+
+        // 配置随机种子
+        configureRandomSeed(flow);
+        return flow;
     }
 
     private void validateDrawRequest(DrawDto drawDto) {
@@ -175,13 +254,13 @@ public class DrawServiceImpl implements DrawService {
 
     private String buildFileUrl(String fileName) {
         return String.format("http://%s:%s/view?filename=%s&type=output&preview=WEBP",
-            comfyUiProperties.getHost(),
-            comfyUiProperties.getPort(),
-            fileName);
+                comfyUiProperties.getHost(),
+                comfyUiProperties.getPort(),
+                fileName);
     }
 
     private void saveDrawRecord(DrawDto drawDto, String negativePrompt,
-                              String imageUrl, int userId, String taskId, BaseFlowWork baseFlowWork) {
+                                String imageUrl, int userId, String taskId, BaseFlowWork baseFlowWork) {
         try {
             DrawRecord drawRecord = new DrawRecord();
             drawRecord.setUserId(userId);

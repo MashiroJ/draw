@@ -13,6 +13,7 @@ spring:
     auto-clear-task: true # 提交绘图任务时，如果ComfyUi内部有非当前服务提交的任务时是否自动取消
     queue:
       type: thread
+    input-path: /Users/mashiro/ComfyUI/input
   #数据库配置
   datasource:
     driver-class-name: ${draw.datasource.driver-class-name}

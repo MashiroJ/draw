@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "绘图相关接口")
 @Slf4j
@@ -27,6 +28,13 @@ public class DrawController {
         return Result.ok(flow);
     }
 
+    @Operation(summary = "查看图片")
+    @GetMapping("viewImg")
+    public Result viewImg(String taskId) {
+        Result<String> stringResult = drawService.viewImg(taskId);
+        return Result.ok(stringResult);
+    }
+
     /**
      * 提交任务
      *
@@ -35,17 +43,19 @@ public class DrawController {
      */
     @Operation(summary = "文生图")
     @PostMapping("text2img")
-    public Result<String> text2img(DrawDto drawDto ,@RequestParam BaseFlowWork baseFlowWork) throws InterruptedException {
+    public Result<String> text2img(DrawDto drawDto, @RequestParam BaseFlowWork baseFlowWork) throws InterruptedException {
         String text2imgUrl = drawService.text2img(drawDto, baseFlowWork);
         return Result.ok(text2imgUrl);
     }
 
-    @Operation(summary = "查看图片")
-    @GetMapping("viewImg")
-    public Result viewImg(String taskId) {
-        Result<String> stringResult = drawService.viewImg(taskId);
-        return Result.ok(stringResult);
+    @Operation(summary = "图生图")
+    @PostMapping("img2img")
+    public Result<String> img2img(DrawDto drawDto, @RequestParam BaseFlowWork baseFlowWork, @RequestPart(required = false) MultipartFile uploadImage) {
+        String img2imgUrl = drawService.img2img(drawDto,uploadImage, baseFlowWork);
+        return Result.ok(img2imgUrl);
     }
+
+
 }
 
 

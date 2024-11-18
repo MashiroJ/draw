@@ -1,6 +1,5 @@
 package com.mashiro.dto;
 
-import com.mashiro.enums.BaseFlowWork;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
