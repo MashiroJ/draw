@@ -8,8 +8,10 @@ import com.comfyui.queue.common.IDrawingTaskSubmit;
 import com.mashiro.dto.DrawDto;
 import com.mashiro.entity.DrawRecord;
 import com.mashiro.enums.BaseFlowWork;
+import com.mashiro.exception.DrawException;
 import com.mashiro.mapper.DrawRecordMapper;
 import com.mashiro.result.Result;
+import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.DrawService;
 import com.mashiro.service.FileService;
 import com.mashiro.utils.ComfyUi.ComfyUiProperties;
@@ -18,7 +20,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,6 +33,9 @@ import static com.mashiro.constant.UserConstant.DEFAULT_TASK_ID;
 @Slf4j
 @Service
 public class DrawServiceImpl implements DrawService {
+
+    private static final int TASK_WAIT_TIME = 20000; // 10 seconds
+    private static final int TASK_TIMEOUT = 5; // 5 minutes
 
     @Resource
     private IDrawingTaskSubmit taskSubmit;
@@ -45,117 +50,153 @@ public class DrawServiceImpl implements DrawService {
     @Resource
     private DrawRecordMapper drawRecordMapper;
 
-
-    /**
-     * 根据TaskId查看图片
-     *
-     * @param taskId
-     * @return
-     */
-    @Override
-    public Result<String> viewImg(String taskId) {
-        String host = comfyUiProperties.getHost();
-        String port = comfyUiProperties.getPort();
-        String fileName = taskProcessMonitor.getTaskOutputFileName(taskId);
-
-        if (fileName != null) {
-            String fileUrl = "http://" + host + ":" + port + "/view?filename=" + fileName + "&type=output&preview=WEBP";
-            String url = fileService.uploadFromUrl(fileUrl);
-            return Result.ok(url);
-        } else {
-            return Result.error("未找到对应任务的输出文件名");
-        }
-    }
-
-
     /**
      * 获取指定工作流
-     *
-     * @return
+     * @param workFlowName 工作流名称
+     * @return 工作流对象
      */
     public ComfyWorkFlow getFlow(String workFlowName) {
-        String FlowName = workFlowName + ".json";
-        org.springframework.core.io.Resource resource = resourceLoader.getResource("classpath:" + FlowName);
+        String flowName = workFlowName + ".json";
+        org.springframework.core.io.Resource resource = resourceLoader.getResource("classpath:" + flowName);
         StringBuilder flowStr = new StringBuilder();
+
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 flowStr.append(line);
             }
         } catch (IOException e) {
+            log.error("读取工作流文件失败: {}", flowName, e);
             return null;
         }
+
         return ComfyWorkFlow.of(flowStr.toString());
     }
 
     /**
-     * 提交文生图任务
-     *
-     * @param drawDto
-     * @param baseFlowWork
+     * 查看图片
+     * @param taskId
      * @return
      */
     @Override
-    public Result<String> text2img(@RequestBody DrawDto drawDto, BaseFlowWork baseFlowWork) throws InterruptedException {
+    public Result<String> viewImg(String taskId) {
+        try {
+            String fileName = taskProcessMonitor.getTaskOutputFileName(taskId);
+            if (!StringUtils.hasText(fileName)) {
+                return Result.build(null, ResultCodeEnum.DATA_ERROR);
+            }
+            String fileUrl = buildFileUrl(fileName);
+            String url = fileService.uploadFromUrl(fileUrl);
+            return Result.ok(url);
+        } catch (Exception e) {
+            log.error("查看图片失败，taskId: {}", taskId, e);
+            return Result.build(null, ResultCodeEnum.SERVICE_ERROR);
+        }
+    }
+
+    @Override
+    public String text2img(DrawDto drawDto, BaseFlowWork baseFlowWork) {
+        validateDrawRequest(drawDto);
+
+        String taskId = generateTaskId();
         int loginUserId = StpUtil.getLoginIdAsInt();
-        String taskId = String.valueOf(loginUserId + DEFAULT_TASK_ID);
         log.info("用户ID: {}, 提交任务，任务ID: {}", loginUserId, taskId);
-        String ChinesePrompt = drawDto.getPrompt();
-        if (ChinesePrompt == null || ChinesePrompt.trim().isEmpty()) {
-            throw new IllegalArgumentException("绘画提示词不能为空");
-        }
 
-        // 获取工作流并设置参数
-        ComfyWorkFlow flow = getFlow(String.valueOf(baseFlowWork));
+        try {
+            ComfyWorkFlow flow = prepareWorkFlow(baseFlowWork);
+            String negativePrompt = submitDrawingTask(flow, taskId);
+            String imageUrl = processTaskResult(taskId);
+            saveDrawRecord(drawDto, negativePrompt, imageUrl, loginUserId, taskId, baseFlowWork);
+            return imageUrl;
+        } catch (InterruptedException e) {
+            log.error("任务执行被中断，userId: {}, taskId: {}", loginUserId, taskId, e);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        } catch (Exception e) {
+            log.error("文生图失败，userId: {}, taskId: {}", loginUserId, taskId, e);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
+    }
+
+    private void validateDrawRequest(DrawDto drawDto) {
+        if (!StringUtils.hasText(drawDto.getPrompt())) {
+            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
+        }
+    }
+
+    private String generateTaskId() {
+        if (StpUtil.getLoginId() == null) {
+            throw new DrawException(ResultCodeEnum.APP_LOGIN_AUTH);
+        }
+        return String.valueOf(StpUtil.getLoginIdAsInt() + DEFAULT_TASK_ID);
+    }
+
+    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork) {
+        ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
         if (flow == null) {
-            throw new RuntimeException("工作流获取失败");
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
-        log.info("已获取工作流: {}", flow);
+        configureRandomSeed(flow);
+        return flow;
+    }
 
-        // 根据工作流节点中的节点ID获取节点对象，并设置随机种子
+    private void configureRandomSeed(ComfyWorkFlow flow) {
         ComfyWorkFlowNode node3 = flow.getNode("3");
         if (node3 != null) {
-            int randomSeed = Math.abs(new Random().nextInt());
-            node3.getInputs().put("seed", randomSeed);
-            log.info("已设置节点3的随机种子: {}", randomSeed);
+            node3.getInputs().put("seed", Math.abs(new Random().nextInt()));
         } else {
             log.warn("工作流中未找到ID为 '3' 的节点");
         }
+    }
 
-        // 反向提示词
+    private String submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
         ComfyWorkFlowNode node7 = flow.getNode("7");
-        String NegativePrompt = (String) node7.getInputs().get("text");
+        String negativePrompt = node7 != null ? (String) node7.getInputs().get("text") : "";
 
-        // 提交任务
-        DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, 5, TimeUnit.MINUTES);
+        DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
         taskSubmit.submit(drawingTaskInfo);
+        Thread.sleep(TASK_WAIT_TIME);
 
-        //20秒
-        Thread.sleep(10000);
-        String host = comfyUiProperties.getHost();
-        String port = comfyUiProperties.getPort();
+        return negativePrompt;
+    }
+
+    private String processTaskResult(String taskId) {
         String fileName = taskProcessMonitor.getTaskOutputFileName(taskId);
-        if (fileName != null) {
-            String fileUrl = "http://" + host + ":" + port + "/view?filename=" + fileName + "&type=output&preview=WEBP";
-            String url = fileService.uploadFromUrl(fileUrl);
-            // 创建并保存 DrawRecord 实例
+        if (!StringUtils.hasText(fileName)) {
+            throw new DrawException(ResultCodeEnum.DATA_ERROR);
+        }
+
+        String fileUrl = buildFileUrl(fileName);
+        String url = fileService.uploadFromUrl(fileUrl);
+        if (!StringUtils.hasText(url)) {
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
+        return url;
+    }
+
+    private String buildFileUrl(String fileName) {
+        return String.format("http://%s:%s/view?filename=%s&type=output&preview=WEBP",
+            comfyUiProperties.getHost(),
+            comfyUiProperties.getPort(),
+            fileName);
+    }
+
+    private void saveDrawRecord(DrawDto drawDto, String negativePrompt,
+                              String imageUrl, int userId, String taskId, BaseFlowWork baseFlowWork) {
+        try {
             DrawRecord drawRecord = new DrawRecord();
-            drawRecord.setUserId(loginUserId);
+            drawRecord.setUserId(userId);
             drawRecord.setTaskId(taskId);
             drawRecord.setPrompt(drawDto.getPrompt());
-            drawRecord.setNegativePrompt(NegativePrompt);
+            drawRecord.setNegativePrompt(negativePrompt);
             drawRecord.setGenerationType("TEXT2IMG");
             drawRecord.setWorkFlowName(baseFlowWork);
             drawRecord.setIsPublic(drawDto.getIsPublic());
-            drawRecord.setImageUrl(url);
+            drawRecord.setImageUrl(imageUrl);
+
             drawRecordMapper.insert(drawRecord);
-            log.info("已创建 DrawRecord，任务ID: {}", taskId);
-            return Result.ok(url);
-        } else {
-            return Result.error("未找到对应任务的输出文件名");
+        } catch (Exception e) {
+            log.error("保存绘图记录失败，userId: {}, taskId: {}", userId, taskId, e);
+            throw new DrawException(ResultCodeEnum.DATA_ERROR);
         }
     }
 }
-
-
-

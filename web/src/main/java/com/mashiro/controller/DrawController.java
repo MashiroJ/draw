@@ -21,7 +21,7 @@ public class DrawController {
     private DrawService drawService;
 
     @GetMapping("getFlow")
-    @Operation(summary = "获取默认工作流")
+    @Operation(summary = "获取工作流")
     public Result getFlow(String workFlowName) {
         ComfyWorkFlow flow = drawService.getFlow(workFlowName);
         return Result.ok(flow);
@@ -33,11 +33,11 @@ public class DrawController {
      * @param drawDto 绘图参数
      * @return
      */
-    @Operation(summary = "提交任务")
+    @Operation(summary = "文生图")
     @PostMapping("text2img")
     public Result<String> text2img(DrawDto drawDto ,@RequestParam BaseFlowWork baseFlowWork) throws InterruptedException {
-        String stringResult = String.valueOf(drawService.text2img(drawDto,baseFlowWork));
-        return Result.ok(stringResult);
+        String text2imgUrl = drawService.text2img(drawDto, baseFlowWork);
+        return Result.ok(text2imgUrl);
     }
 
     @Operation(summary = "查看图片")

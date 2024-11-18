@@ -6,9 +6,9 @@ import com.mashiro.exception.DrawException;
 import com.mashiro.result.ResultCodeEnum;
 
 public enum BaseFlowWork implements BaseEnum {
-    DEFAULT(1, "默认工作流"),
-    TEXT2IMG(2, "文生图工作流"),
-    IMG2IMG(3, "图生图工作流");
+    DEFAULT(1, "default"),
+    TEXT2IMG(2, "text2img"),
+    IMG2IMG(3, "img2img");
 
     @EnumValue
     private Integer code;
