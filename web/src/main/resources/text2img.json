@@ -120,18 +120,5 @@
     "_meta": {
       "title": "翻译文本(Argos翻译)"
     }
-  },
-  "11": {
-    "inputs": {
-      "text": [
-        "10",
-        0
-      ],
-      "text2": "A masterpiece of the best quality, a girl, Lori, cute, solo, beautiful and delicate eyes, fine faces, sweaters, pink hair, cheeks, violet eyes, colored high, shirts, micro skirts, black panty stockings, visualization, streets, bell towers, deep, grey background colours."
-    },
-    "class_type": "ShowText|pysssss",
-    "_meta": {
-      "title": "展示文本"
-    }
   }
 }
