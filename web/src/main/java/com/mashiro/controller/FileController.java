@@ -46,7 +46,7 @@ public class FileController {
      */
     @Operation(summary = "上传文件")
     @PostMapping("upload")
-    public Result<String> upload(@RequestParam MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
+    public Result<String> upload(@RequestPart(required = false) MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
         // 调用fileService的upload方法，上传文件并获取文件的URL
         String url = fileService.upload(file);
         // 返回一个成功的Result对象，包含文件的URL
