@@ -2,7 +2,6 @@ package com.mashiro.controller;
 
 import com.comfyui.common.entity.ComfyWorkFlow;
 import com.mashiro.dto.DrawDto;
-import com.mashiro.enums.BaseFlowWork;
 import com.mashiro.result.Result;
 import com.mashiro.service.DrawService;
 import io.swagger.v3.oas.annotations.Operation;

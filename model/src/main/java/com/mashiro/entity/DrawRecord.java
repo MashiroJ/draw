@@ -1,12 +1,10 @@
 package com.mashiro.entity;
 
-import com.baomidou.mybatisplus.annotation.*;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import com.mashiro.enums.BaseFlowWork;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
-import java.util.Date;
 @Data
 @TableName(value = "draw_record")
 public class DrawRecord extends BaseEntity {
