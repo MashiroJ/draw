@@ -7,11 +7,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface DrawService {
 
-
     Result<String> viewImg(String taskId);
 
     ComfyWorkFlow getFlow(String workFlowName);
-
 
     String text2img(DrawDto drawDto);
 
