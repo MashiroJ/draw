@@ -61,9 +61,17 @@ public class Knife4jConfiguration {
     }
 
     @Bean
-    public GroupedOpenApi DrawRecordAPI() {
+    public GroupedOpenApi drawRecordAPI() {
         return GroupedOpenApi.builder().group("绘画记录管理").
                 pathsToMatch("/system/dr/**").
                 build();
     }
+    @Bean
+    public GroupedOpenApi drawLikeAPI() {
+        return GroupedOpenApi.builder().group("绘画点赞管理").
+                pathsToMatch("/system/draw/like/**").
+                build();
+    }
+
+
 }

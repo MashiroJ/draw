@@ -7,4 +7,5 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface DrawRecordMapper extends BaseMapper<DrawRecord> {
 
+    void updateDrawLikeCount(Long drawId, int newLikeCount);
 }
