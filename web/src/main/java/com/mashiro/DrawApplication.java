@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @MapperScan("com.mashiro.mapper")
 @SpringBootApplication
-public class DrawApplication {
+public class  DrawApplication {
     public static void main(String[] args) {
         SpringApplication.run(DrawApplication.class, args);
         System.out.println("DrawAi启动成功，" +

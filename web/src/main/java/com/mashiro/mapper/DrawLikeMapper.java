@@ -13,4 +13,6 @@ public interface DrawLikeMapper extends BaseMapper<DrawLike> {
     List<DrawLike> selectByDrawId(Long drawId);
 
     List<DrawLike> selectByUserId(Integer userId);
+
+    void updateIsLikedByDrawIdAndUserId(Long drawId, Integer userId, boolean isLiked);
 }

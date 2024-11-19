@@ -11,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Slf4j
 @Service
 public class DrawLikeServiceImpl extends ServiceImpl<DrawLikeMapper, DrawLike> implements DrawLikeService {
+
     @Resource
     private DrawLikeMapper drawLikeMapper;
 
@@ -32,7 +34,8 @@ public class DrawLikeServiceImpl extends ServiceImpl<DrawLikeMapper, DrawLike> i
         DrawLike existingLike = drawLikeMapper.selectByDrawIdAndUserId(drawId, userId);
         if (existingLike != null) {
             // 取消点赞
-            drawLikeMapper.deleteById(existingLike.getId());
+            boolean isLiked = false;
+            drawLikeMapper.updateIsLikedByDrawIdAndUserId(drawId, userId, isLiked);
             // 更新绘画表的 like_count 字段
             updateDrawLikeCount(drawId, -1);
             log.info("取消点赞: drawId={}, userId={}", drawId, userId);
@@ -42,6 +45,7 @@ public class DrawLikeServiceImpl extends ServiceImpl<DrawLikeMapper, DrawLike> i
             DrawLike like = new DrawLike();
             like.setDrawId(drawId);
             like.setUserId(userId);
+            like.setIsLiked(true); // 设置 is_liked 为 true
             drawLikeMapper.insert(like);
             // 更新绘画表的 like_count 字段
             updateDrawLikeCount(drawId, 1);
