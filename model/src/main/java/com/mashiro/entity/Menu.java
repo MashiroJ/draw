@@ -34,11 +34,6 @@ public class Menu implements Serializable {
     private String path;
 
     /**
-     * 父菜单ID，根菜单为NULL
-     */
-    private Integer parentId;
-
-    /**
      * 菜单图标
      */
     private String icon;

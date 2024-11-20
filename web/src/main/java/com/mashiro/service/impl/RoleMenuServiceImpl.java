@@ -30,14 +30,10 @@ public class RoleMenuServiceImpl extends ServiceImpl<RoleMenuMapper, RoleMenu>
 
     @Override
     public Map<String, Object> getMenuIdsByRoleId(Long roleId) {// 通过用户ID获取用户相关联的角色ID
-
-
         // 存储所有菜单ID
         List<Long> allRoleMenuIds = new ArrayList<>();
-
         List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
         allRoleMenuIds.addAll(roleMenuIds);
-
         // 初始化结果Map，将所有菜单ID存储到Map中进行返回
         Map<String, Object> result = new HashMap<>();
         result.put("roleMenuIds", allRoleMenuIds);
