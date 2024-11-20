@@ -25,7 +25,6 @@ public class DrawLikeController {
      * 切换点赞状态(点赞/取消点赞)
      *
      * @param drawId 绘画ID
-     * @param userId 用户ID
      * @return 点赞记录
      */
     @Operation(summary = "切换点赞状态")
