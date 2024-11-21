@@ -1,18 +1,15 @@
 package com.mashiro.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mashiro.entity.DrawLike;
-import com.mashiro.entity.DrawRecord;
 import com.mashiro.mapper.DrawLikeMapper;
 import com.mashiro.mapper.DrawRecordMapper;
 import com.mashiro.service.DrawLikeService;
 import jakarta.annotation.Resource;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
-@Slf4j
 @Service
 public class DrawLikeServiceImpl extends ServiceImpl<DrawLikeMapper, DrawLike> implements DrawLikeService {
 
@@ -22,75 +19,70 @@ public class DrawLikeServiceImpl extends ServiceImpl<DrawLikeMapper, DrawLike> i
     @Resource
     private DrawRecordMapper drawRecordMapper;
 
-    /**
-     * 切换点赞状态(点赞/取消点赞)
-     *
-     * @param drawId 绘画ID
-     * @param userId 用户ID
-     * @return 点赞记录
-     */
-    public DrawLike toggleLike(Long drawId, Integer userId) {
-        // 检查是否已经点过赞
-        DrawLike existingLike = drawLikeMapper.selectByDrawIdAndUserId(drawId, userId);
+    @Override
+    public boolean checkIfLiked(Long drawId, Integer userId) {
+        QueryWrapper<DrawLike> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("draw_id", drawId)
+                .eq("user_id", userId);
+        return drawLikeMapper.selectCount(queryWrapper) > 0;
+    }
+
+    @Override
+    @Transactional
+    public boolean addLike(Long drawId, Integer userId) {
+        // 查询包括逻辑删除的记录
+        DrawLike existingLike = drawLikeMapper.selectByUserIdAndDrawIdIncludingDeleted(userId, drawId);
+
         if (existingLike != null) {
-            // 取消点赞
-            boolean isLiked = false;
-            drawLikeMapper.updateIsLikedByDrawIdAndUserId(drawId, userId, isLiked);
-            // 更新绘画表的 like_count 字段
-            updateDrawLikeCount(drawId, -1);
-            log.info("取消点赞: drawId={}, userId={}", drawId, userId);
-            return null;
+            if (existingLike.getIsDeleted().equals((byte) 1)) {
+                // 恢复逻辑删除的记录
+                existingLike.setIsDeleted((byte) 0);
+                drawLikeMapper.updateById(existingLike);
+            } else {
+                // 已存在未删除的点赞记录，不应再次点赞
+                return false;
+            }
         } else {
-            // 点赞
-            DrawLike like = new DrawLike();
-            like.setDrawId(drawId);
-            like.setUserId(userId);
-            like.setIsLiked(true); // 设置 is_liked 为 true
-            drawLikeMapper.insert(like);
-            // 更新绘画表的 like_count 字段
-            updateDrawLikeCount(drawId, 1);
-            log.info("点赞: drawId={}, userId={}", drawId, userId);
-            return like;
+            // 插入新记录
+            DrawLike drawLike = new DrawLike();
+            drawLike.setDrawId(drawId);
+            drawLike.setUserId(userId);
+            drawLikeMapper.insert(drawLike);
         }
+
+        // 更新绘画记录的点赞数
+        drawRecordMapper.incrementLikeCount(drawId);
+
+        return true;
     }
 
-    /**
-     * 更新绘画表的 like_count 字段
-     *
-     * @param drawId    绘画ID
-     * @param likeCount 点赞数变化量
-     */
-    private void updateDrawLikeCount(Long drawId, int likeCount) {
-        // 查询绘画表的当前 like_count 值
-        DrawRecord drawRecord = drawRecordMapper.selectById(drawId);
-        int newLikeCount = drawRecord.getLikeCount() + likeCount;
-        // 更新绘画表的 like_count 字段
-        drawRecordMapper.updateDrawLikeCount(drawId, newLikeCount);
+    @Override
+    @Transactional
+    public boolean removeLike(Long drawId, Integer userId) {
+        // 查询点赞记录
+        QueryWrapper<DrawLike> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("draw_id", drawId)
+                .eq("user_id", userId);
+        DrawLike existingLike = drawLikeMapper.selectOne(queryWrapper);
+
+        if (existingLike == null) {
+            // 未找到点赞记录
+            return false;
+        }
+
+        // 执行逻辑删除
+        drawLikeMapper.deleteById(existingLike.getId());
+
+        // 更新绘画记录的点赞数
+        drawRecordMapper.decrementLikeCount(drawId);
+
+        return true;
     }
 
-    /**
-     * 根据绘画ID获取点赞列表
-     *
-     * @param drawId 绘画ID
-     * @return 点赞列表
-     */
-    public List<DrawLike> getLikesByDrawId(Long drawId) {
-        // 获取某个绘画的点赞列表
-        List<DrawLike> likes = drawLikeMapper.selectByDrawId(drawId);
-        log.info("获取某个绘画的点赞列表: drawId={}, count={}", drawId, likes.size());
-        return likes;
-    }
-
-    /**
-     * 根据用户ID获取点赞列表
-     *
-     * @param userId 用户ID
-     * @return 点赞列表
-     */
-    public List<DrawLike> getLikesByUserId(Integer userId) {
-        // 获取某个用户的点赞列表
-        List<DrawLike> likes = drawLikeMapper.selectByUserId(userId);
-        log.info("获取某个用户的点赞列表: userId={}, count={}", userId, likes.size());
-        return likes;
+    @Override
+    public long getLikeCount(Long drawId) {
+        QueryWrapper<DrawLike> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("draw_id", drawId);
+        return drawLikeMapper.selectCount(queryWrapper);
     }
 }

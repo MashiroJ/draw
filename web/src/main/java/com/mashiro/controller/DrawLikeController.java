@@ -1,7 +1,6 @@
 package com.mashiro.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
-import com.mashiro.entity.DrawLike;
 import com.mashiro.result.Result;
 import com.mashiro.service.DrawLikeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,8 +8,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "绘画点赞管理")
 @Slf4j
@@ -22,60 +19,69 @@ public class DrawLikeController {
     private DrawLikeService drawLikeService;
 
     /**
-     * 切换点赞状态(点赞/取消点赞)
-     *
-     * @param drawId 绘画ID
-     * @return 点赞记录
+     * 用户点赞
      */
-    @Operation(summary = "切换点赞状态")
-    @PostMapping("/{drawId}")
-    public Result<DrawLike> toggleLike(@PathVariable Long drawId) {
-        int userId = StpUtil.getLoginIdAsInt();
-        // 记录请求参数日志
-        log.info("切换点赞状态: drawId={}, userId={}", drawId, userId);
+    @Operation(summary = "点赞")
+    @PostMapping("/like")
+    public Result<?> like(@RequestParam("draw_id") Long drawId) {
+        Integer userId = StpUtil.getLoginIdAsInt();  // 使用 sa-token 获取当前用户 ID
 
-        // 切换点赞状态
-        DrawLike like = drawLikeService.toggleLike(drawId, userId);
+        // 判断用户是否已经点赞
+        boolean alreadyLiked = drawLikeService.checkIfLiked(drawId, userId);
+        if (alreadyLiked) {
+            return Result.error("您已点赞过该绘画");
+        }
 
-        // 返回点赞记录
-        return Result.ok(like);
+        // 执行点赞操作
+        boolean success = drawLikeService.addLike(drawId, userId);
+        if (success) {
+            return Result.ok("点赞成功");
+        } else {
+            return Result.error("点赞失败");
+        }
     }
 
     /**
-     * 获取某个绘画的点赞列表
-     *
-     * @param drawId 绘画ID
-     * @return 点赞列表
+     * 取消点赞
      */
-    @Operation(summary = "获取某个绘画的点赞列表")
-    @GetMapping("/draw/{drawId}")
-    public Result<List<DrawLike>> getLikesByDrawId(@PathVariable Long drawId) {
-        // 记录请求参数日志
-        log.info("获取某个绘画的点赞列表: drawId={}", drawId);
+    @Operation(summary = "取消点赞")
+    @DeleteMapping("/unlike")
+    public Result<?> unlike(@RequestParam("draw_id") Long drawId) {
+        Integer userId = StpUtil.getLoginIdAsInt();  // 使用 sa-token 获取当前用户 ID
 
-        // 获取点赞列表
-        List<DrawLike> likes = drawLikeService.getLikesByDrawId(drawId);
+        // 判断用户是否已点赞
+        boolean alreadyLiked = drawLikeService.checkIfLiked(drawId, userId);
+        if (!alreadyLiked) {
+            return Result.error("您尚未点赞过该绘画");
+        }
 
-        // 返回点赞列表
-        return Result.ok(likes);
+        // 执行取消点赞操作
+        boolean success = drawLikeService.removeLike(drawId, userId);
+        if (success) {
+            return Result.ok("取消点赞成功");
+        } else {
+            return Result.error("取消点赞失败");
+        }
     }
 
     /**
-     * 获取某个用户的点赞列表
-     *
-     * @param userId 用户ID
-     * @return 点赞列表
+     * 获取绘画的点赞数
      */
-    @Operation(summary = "获取某个用户的点赞列表")
-    @GetMapping("/user/{userId}")
-    public Result<List<DrawLike>> getLikesByUserId(@PathVariable Integer userId) {
-        // 记录请求参数日志
-        log.info("获取某个用户的点赞列表: userId={}", userId);
+    @Operation(summary = "获取点赞数")
+    @GetMapping("/count")
+    public Result<?> getLikeCount(@RequestParam("draw_id") Long drawId) {
+        long likeCount = drawLikeService.getLikeCount(drawId);
+        return Result.ok(likeCount);
+    }
 
-        // 获取点赞列表
-        List<DrawLike> likes = drawLikeService.getLikesByUserId(userId);
-
-        // 返回点赞列表
-        return Result.ok(likes);
+    /**
+     * 获取当前用户对绘画的点赞状态
+     */
+    @GetMapping("/status")
+    @Operation(summary = "获取点赞状态")
+    public Result<?> getLikeStatus(@RequestParam("draw_id") Long drawId) {
+        Integer userId = StpUtil.getLoginIdAsInt();  // 使用 sa-token 获取当前用户 ID
+        boolean liked = drawLikeService.checkIfLiked(drawId, userId);
+        return Result.ok(liked);
     }
 }

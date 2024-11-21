@@ -16,8 +16,4 @@ public class DrawLike extends BaseEntity {
     @Schema(description = "用户ID")
     @TableField("user_id")
     private Integer userId;
-
-    @Schema(description = "是否点赞")
-    @TableField("is_liked")
-    private Boolean isLiked;
 }

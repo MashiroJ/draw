@@ -2,27 +2,5 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.mashiro.mapper.DrawLikeMapper">
-    <update id="updateIsLikedByDrawIdAndUserId">
-    UPDATE draw_like
-    SET is_liked = #{isLiked}
-    WHERE draw_id = #{drawId} AND user_id = #{userId}
-</update>
 
-    <select id="selectByDrawIdAndUserId" resultType="com.mashiro.entity.DrawLike">
-        SELECT *
-        FROM draw_like
-        WHERE draw_id = #{drawId} AND user_id = #{userId}
-    </select>
-
-    <select id="selectByDrawId" resultType="com.mashiro.entity.DrawLike">
-        SELECT *
-        FROM draw_like
-        WHERE draw_id = #{drawId}
-    </select>
-
-    <select id="selectByUserId" resultType="com.mashiro.entity.DrawLike">
-        SELECT *
-        FROM draw_like
-        WHERE user_id = #{userId}
-    </select>
 </mapper>
