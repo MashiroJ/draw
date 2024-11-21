@@ -13,6 +13,8 @@ public interface DrawLikeMapper extends BaseMapper<DrawLike> {
     void updateByIdAndIsDeleted(Long id);
 
     void updateByIdAndNotDeleted(Long id);
+
+    DrawLike selectByUserIdAndDrawId(Integer userId, Long drawId);
 }
 
 

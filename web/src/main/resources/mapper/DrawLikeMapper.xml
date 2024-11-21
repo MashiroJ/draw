@@ -18,4 +18,11 @@
         WHERE user_id = #{userId}
           AND draw_id = #{drawId}
     </select>
+    <select id="selectByUserIdAndDrawId" resultType="com.mashiro.entity.DrawLike">
+        SELECT *
+        FROM draw_like
+        WHERE user_id = #{userId}
+          AND draw_id = #{drawId}
+          AND is_deleted = 0
+    </select>
 </mapper>

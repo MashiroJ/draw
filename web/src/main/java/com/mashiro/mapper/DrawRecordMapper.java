@@ -21,5 +21,7 @@ public interface DrawRecordMapper extends BaseMapper<DrawRecord> {
 
     @Select("SELECT COUNT(1) FROM draw_record WHERE id = #{id}")
     boolean existsById(@Param("id") Long id);
+
+    Long getLikeCount(Long drawId);
 }
 

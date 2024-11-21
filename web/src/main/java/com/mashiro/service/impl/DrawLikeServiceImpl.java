@@ -10,6 +10,7 @@ import com.mashiro.service.DrawLikeService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +19,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class DrawLikeServiceImpl extends ServiceImpl<DrawLikeMapper, DrawLike> implements DrawLikeService {
 
     public static final byte DELETED = 1;
+    private static final String LIKE_COUNT_KEY_PREFIX = "draw:likeCount:";
+    private static final String USER_LIKE_KEY_PREFIX = "draw:userLike:";
+
     @Resource
     private DrawLikeMapper drawLikeMapper;
 
     @Resource
     private DrawRecordMapper drawRecordMapper;
+
+    @Resource
+    private RedisTemplate<String, Object> redisTemplate;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
