@@ -55,6 +55,13 @@ public class UserController {
         return Result.ok(user);
     }
 
+    @Operation(summary = "根据Id获取用户信息")
+    @GetMapping("/userInfoById")
+    public Result<User> userInfoById(@RequestParam long id) {
+        User user = userService.getById(id);
+        return Result.ok(user);
+    }
+
     /**
      * 分页查询用户信息
      *
