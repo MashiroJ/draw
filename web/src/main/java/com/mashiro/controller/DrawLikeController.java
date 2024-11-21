@@ -19,8 +19,11 @@ public class DrawLikeController {
     @Resource
     private DrawLikeService drawLikeService;
 
+
     /**
      * 点赞/取消点赞
+     * @param drawId
+     * @return
      */
     @Operation(summary = "点赞/取消点赞")
     @PostMapping("/{drawId}/like-toggle")
