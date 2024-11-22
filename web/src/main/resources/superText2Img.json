@@ -1,12 +1,12 @@
 {
   "3": {
     "inputs": {
-      "seed": 326719464888065,
+      "seed": 156680208700286,
       "steps": 20,
-      "cfg": 7,
+      "cfg": 8,
       "sampler_name": "euler",
       "scheduler": "normal",
-      "denoise": 0.7000000000000001,
+      "denoise": 1,
       "model": [
         "4",
         0
@@ -31,7 +31,7 @@
   },
   "4": {
     "inputs": {
-      "ckpt_name": "Counterfeit-V2.5_pruned.safetensors"
+      "ckpt_name": "v1-5-pruned-emaonly.safetensors"
     },
     "class_type": "CheckpointLoaderSimple",
     "_meta": {
@@ -40,8 +40,8 @@
   },
   "5": {
     "inputs": {
-      "width": 384,
-      "height": 384,
+      "width": 512,
+      "height": 512,
       "batch_size": 1
     },
     "class_type": "EmptyLatentImage",
@@ -51,10 +51,7 @@
   },
   "6": {
     "inputs": {
-      "text": [
-        "10",
-        0
-      ],
+      "text": "",
       "speak_and_recognation": true,
       "clip": [
         "4",
@@ -68,7 +65,7 @@
   },
   "7": {
     "inputs": {
-      "text": "badhandv4, EasyNegative, verybadimagenegative_v1.3,illustration, 3d, sepia, painting, cartoons, sketch, (worst quality:1.74), (low quality:1.74), (normal quality:1.44), lowres, bad anatomy, normal quality, ((monochrome)), ((grayscale)), ((letters)), ((english)), capital.",
+      "text": "",
       "speak_and_recognation": true,
       "clip": [
         "4",
@@ -107,18 +104,6 @@
     "class_type": "SaveImage",
     "_meta": {
       "title": "保存图像"
-    }
-  },
-  "10": {
-    "inputs": {
-      "from_translate": "chinese",
-      "to_translate": "english",
-      "text": "杰作，质量最好，1个女孩，洛丽，可爱，独唱，美丽细致的眼睛，精致的脸，毛衣，粉红色的头发，侧髻，紫罗兰色的眼睛，高光染色，衬衫，微裙，黑色连裤袜，透视，街道，钟楼，景深，灰色背景着色。",
-      "speak_and_recognation": true
-    },
-    "class_type": "ArgosTranslateTextNode",
-    "_meta": {
-      "title": "翻译文本(Argos翻译)"
     }
   }
 }

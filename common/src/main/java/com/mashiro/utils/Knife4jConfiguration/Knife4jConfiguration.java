@@ -66,6 +66,7 @@ public class Knife4jConfiguration {
                 pathsToMatch("/system/draw/record/**").
                 build();
     }
+
     @Bean
     public GroupedOpenApi drawLikeAPI() {
         return GroupedOpenApi.builder().group("绘画点赞管理").
@@ -73,5 +74,10 @@ public class Knife4jConfiguration {
                 build();
     }
 
-
+    @Bean
+    public GroupedOpenApi superDrawLikeAPI() {
+        return GroupedOpenApi.builder().group("超级绘画管理").
+                pathsToMatch("/system/super/draw/**").
+                build();
+    }
 }

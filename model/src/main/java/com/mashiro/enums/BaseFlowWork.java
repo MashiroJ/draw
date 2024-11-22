@@ -8,7 +8,8 @@ import com.mashiro.result.ResultCodeEnum;
 public enum BaseFlowWork implements BaseEnum {
     DEFAULT(1, "default"),
     TEXT2IMG(2, "text2img"),
-    IMG2IMG(3, "img2img");
+    IMG2IMG(3, "img2img"),
+    SUPERTEXT2IMG(4, "superText2Img");
 
     @EnumValue
     private Integer code;
