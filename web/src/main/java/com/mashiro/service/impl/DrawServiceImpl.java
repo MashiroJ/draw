@@ -40,6 +40,8 @@ public class DrawServiceImpl implements DrawService {
 
     private static final int TASK_WAIT_TIME = 20000; // 20秒
     private static final int TASK_TIMEOUT = 5; // 5分钟
+    final String QUALITY_PREFIX = "杰作,质量最好的,";
+
 
     @Resource
     private IDrawingTaskSubmit taskSubmit;
@@ -109,9 +111,9 @@ public class DrawServiceImpl implements DrawService {
     @Override
     public String text2img(DrawDto drawDto) {
         // 参数校验
-//        validateDrawRequest(drawDto);
+        validateDrawRequest(drawDto);
         // 提示词
-        String prompt = drawDto.getPrompt();
+        String prompt = QUALITY_PREFIX + drawDto.getPrompt();
         // 生成任务ID
         String taskId = generateTaskId();
         // 获取用户ID
@@ -154,7 +156,7 @@ public class DrawServiceImpl implements DrawService {
         // 参数校验
         validateImg2ImgRequest(drawDto, uploadImage);
         // 提示词
-        String prompt = drawDto.getPrompt();
+        String prompt = QUALITY_PREFIX + drawDto.getPrompt();
         // 生成任务ID
         String taskId = generateTaskId();
         // 获取用户ID
@@ -192,11 +194,11 @@ public class DrawServiceImpl implements DrawService {
      *
      * @param drawDto
      */
-//    private void validateDrawRequest(DrawDto drawDto) {
-//        if (!StringUtils.hasText(drawDto.getPrompt())) {
-//            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
-//        }
-//    }
+    private void validateDrawRequest(DrawDto drawDto) {
+        if (!StringUtils.hasText(drawDto.getPrompt())) {
+            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
+        }
+    }
 
     /**
      * 校验图生图请求参数
