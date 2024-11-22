@@ -35,26 +35,30 @@ public class DrawController {
     }
 
     /**
-     * 提交任务
+     * 文生图提交任务
      *
      * @param drawDto 绘图参数
      * @return
      */
     @Operation(summary = "文生图")
     @PostMapping("text2img")
-    public Result<String> text2img(DrawDto drawDto) {
+    public Result<String> text2img(@RequestBody DrawDto drawDto) {
         String text2imgUrl = drawService.text2img(drawDto);
         return Result.ok(text2imgUrl);
     }
 
+    /**
+     * 图生图提交任务
+     * @param drawDto
+     * @param uploadImage
+     * @return
+     */
     @Operation(summary = "图生图")
     @PostMapping("img2img")
-    public Result<String> img2img(DrawDto drawDto, @RequestPart(required = false) MultipartFile uploadImage) {
+    public Result<String> img2img(@RequestBody DrawDto drawDto, @RequestPart(required = false) MultipartFile uploadImage) {
         String img2imgUrl = drawService.img2img(drawDto,uploadImage);
         return Result.ok(img2imgUrl);
     }
-
-
 }
 
 

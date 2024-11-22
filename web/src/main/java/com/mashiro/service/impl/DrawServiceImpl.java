@@ -109,7 +109,7 @@ public class DrawServiceImpl implements DrawService {
     @Override
     public String text2img(DrawDto drawDto) {
         // 参数校验
-        validateDrawRequest(drawDto);
+//        validateDrawRequest(drawDto);
         // 提示词
         String prompt = drawDto.getPrompt();
         // 生成任务ID
@@ -192,11 +192,11 @@ public class DrawServiceImpl implements DrawService {
      *
      * @param drawDto
      */
-    private void validateDrawRequest(DrawDto drawDto) {
-        if (!StringUtils.hasText(drawDto.getPrompt())) {
-            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
-        }
-    }
+//    private void validateDrawRequest(DrawDto drawDto) {
+//        if (!StringUtils.hasText(drawDto.getPrompt())) {
+//            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
+//        }
+//    }
 
     /**
      * 校验图生图请求参数
