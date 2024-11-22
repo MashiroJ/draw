@@ -11,9 +11,6 @@ public class DrawDto {
     @Schema(description = "绘画提示词")
     private String prompt;
 
-    @Schema(description = "反向提示词")
-    private String negativePrompt;
-
     @Schema(description = "是否公开：1公开，0私有")
     private Byte isPublic;
 }

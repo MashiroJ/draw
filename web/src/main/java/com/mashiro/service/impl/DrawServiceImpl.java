@@ -127,6 +127,7 @@ public class DrawServiceImpl implements DrawService {
             String negativePrompt = getNegativePrompt(flow);
             // 提交任务
             submitDrawingTask(flow, taskId);
+            // 根据taskId获取图像Url处理任务结果
             String imageUrl = processTaskResult(taskId);
 
             // 保存绘图记录
@@ -171,6 +172,7 @@ public class DrawServiceImpl implements DrawService {
             String negativePrompt = getNegativePrompt(flow);
             // 提交任务
             submitDrawingTask(flow, taskId);
+            // 根据taskId获取图像Url处理任务结果
             String imageUrl = processTaskResult(taskId);
 
             // 保存绘图记录
@@ -212,6 +214,18 @@ public class DrawServiceImpl implements DrawService {
     }
 
     /**
+     * 生成任务ID
+     *
+     * @return
+     */
+    private String generateTaskId() {
+        if (StpUtil.getLoginId() == null) {
+            throw new DrawException(ResultCodeEnum.APP_LOGIN_AUTH);
+        }
+        return String.valueOf(StpUtil.getLoginIdAsInt() + DEFAULT_TASK_ID);
+    }
+
+    /**
      * 预处理文生图工作流
      *
      * @param baseFlowWork
@@ -236,37 +250,6 @@ public class DrawServiceImpl implements DrawService {
         configureRandomSeed(flow);
         log.info("获取修改后的文生图工作流: {}", flow);
         return flow;
-    }
-
-
-    /**
-     * 处理上传的图片
-     *
-     * @param uploadImage
-     * @param taskId
-     * @return
-     */
-    private String handleUploadedImage(MultipartFile uploadImage, String taskId) {
-        try {
-            // 获取原始文件名
-            String originalFilename = uploadImage.getOriginalFilename();
-            // 获取文件扩展名
-            String fileExtension = StringUtils.getFilenameExtension(originalFilename);
-            // 生成保存的文件名
-            String savedFileName = taskId + "." + fileExtension;
-
-            // 保存上传的图片到指定目录
-            Path destinationPath = Paths.get(comfyUiProperties.getInputPath(), savedFileName);
-            // 创建父目录
-            Files.createDirectories(destinationPath.getParent());
-            // 保存文件
-            uploadImage.transferTo(destinationPath.toFile());
-            // 返回保存的文件名
-            return savedFileName;
-        } catch (IOException e) {
-            log.error("图片上传处理失败", e);
-            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
-        }
     }
 
     /**
@@ -300,20 +283,6 @@ public class DrawServiceImpl implements DrawService {
         return flow;
     }
 
-
-    /**
-     * 生成任务ID
-     *
-     * @return
-     */
-    private String generateTaskId() {
-        if (StpUtil.getLoginId() == null) {
-            throw new DrawException(ResultCodeEnum.APP_LOGIN_AUTH);
-        }
-        return String.valueOf(StpUtil.getLoginIdAsInt() + DEFAULT_TASK_ID);
-    }
-
-
     /**
      * 配置随机种子
      *
@@ -328,11 +297,46 @@ public class DrawServiceImpl implements DrawService {
         }
     }
 
+    /**
+     * 处理上传的图片
+     *
+     * @param uploadImage
+     * @param taskId
+     * @return
+     */
+    private String handleUploadedImage(MultipartFile uploadImage, String taskId) {
+        try {
+            // 获取原始文件名
+            String originalFilename = uploadImage.getOriginalFilename();
+            // 获取文件扩展名
+            String fileExtension = StringUtils.getFilenameExtension(originalFilename);
+            // 生成保存的文件名
+            String savedFileName = taskId + "." + fileExtension;
+
+            // 保存上传的图片到指定目录
+            Path destinationPath = Paths.get(comfyUiProperties.getInputPath(), savedFileName);
+            // 创建父目录
+            Files.createDirectories(destinationPath.getParent());
+            // 保存文件
+            uploadImage.transferTo(destinationPath.toFile());
+            // 返回保存的文件名
+            return savedFileName;
+        } catch (IOException e) {
+            log.error("图片上传处理失败", e);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
+    }
+
+    /**
+     * 获取反向提示词
+     *
+     * @param flow
+     * @return
+     */
     private static String getNegativePrompt(ComfyWorkFlow flow) {
         ComfyWorkFlowNode negativePromptNode = flow.getNode("7");
         return (String) negativePromptNode.getInputs().get("text");
     }
-
 
     /**
      * 获取negativePrompt信息，并提交任务
