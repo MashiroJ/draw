@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.mashiro.entity.DrawRecord;
 import com.mashiro.mapper.DrawRecordMapper;
-import com.mashiro.service.DRService;
+import com.mashiro.service.DrawRecordService;
 import com.mashiro.vo.DrawRecordVO;
 import jakarta.annotation.Resource;
 import org.springframework.beans.BeanUtils;
@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class DRServiceImpl extends ServiceImpl<DrawRecordMapper, DrawRecord> implements DRService {
+public class DrawRecordServiceImpl extends ServiceImpl<DrawRecordMapper, DrawRecord> implements DrawRecordService {
 
     @Resource
-    private DrawRecordMapper drawRecordMapper; // 假设有这个Mapper
+    private DrawRecordMapper drawRecordMapper;
 
     @Override
     public List<DrawRecordVO> listAllDrawRecords() {

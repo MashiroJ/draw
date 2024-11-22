@@ -41,21 +41,21 @@ public class Knife4jConfiguration {
 
     @Bean
     public GroupedOpenApi fileApi() {
-        return GroupedOpenApi.builder().group("文件管理").
+        return GroupedOpenApi.builder().group("文件相关管理").
                 pathsToMatch("/system/file/**").
                 build();
     }
 
     @Bean
     public GroupedOpenApi menuApi() {
-        return GroupedOpenApi.builder().group("菜单管理").
+        return GroupedOpenApi.builder().group("菜单相关管理").
                 pathsToMatch("/system/menu/**").
                 build();
     }
 
     @Bean
     public GroupedOpenApi drawApi() {
-        return GroupedOpenApi.builder().group("绘画管理").
+        return GroupedOpenApi.builder().group("绘画创作管理").
                 pathsToMatch("/system/draw/**").
                 build();
     }
@@ -63,7 +63,7 @@ public class Knife4jConfiguration {
     @Bean
     public GroupedOpenApi drawRecordAPI() {
         return GroupedOpenApi.builder().group("绘画记录管理").
-                pathsToMatch("/system/dr/**").
+                pathsToMatch("/system/draw/record/**").
                 build();
     }
     @Bean

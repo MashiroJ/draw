@@ -6,7 +6,7 @@ import com.mashiro.vo.DrawRecordVO;
 
 import java.util.List;
 
-public interface DRService extends IService<DrawRecord> {
+public interface DrawRecordService extends IService<DrawRecord> {
 
     List<DrawRecordVO> listAllDrawRecords();
 
