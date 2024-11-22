@@ -1,6 +1,8 @@
 package com.mashiro.controller;
 
 import com.comfyui.common.entity.ComfyWorkFlow;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashiro.dto.DrawDto;
 import com.mashiro.result.Result;
 import com.mashiro.service.DrawService;
@@ -49,15 +51,25 @@ public class DrawController {
 
     /**
      * 图生图提交任务
+     *
      * @param drawDto
      * @param uploadImage
      * @return
      */
     @Operation(summary = "图生图")
     @PostMapping("img2img")
-    public Result<String> img2img(@RequestBody DrawDto drawDto, @RequestPart(required = false) MultipartFile uploadImage) {
-        String img2imgUrl = drawService.img2img(drawDto,uploadImage);
-        return Result.ok(img2imgUrl);
+    public Result<String> img2img(
+            @RequestPart("drawDto") String drawDtoJson,
+            @RequestPart(value = "uploadImage", required = false) MultipartFile uploadImage
+    ) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            DrawDto drawDto = mapper.readValue(drawDtoJson, DrawDto.class);
+            String img2imgUrl = drawService.img2img(drawDto, uploadImage);
+            return Result.ok(img2imgUrl);
+        } catch (JsonProcessingException e) {
+            return Result.error("参数解析失败：" + e.getMessage());
+        }
     }
 }
 
