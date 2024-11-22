@@ -1,14 +1,14 @@
 {
   "3": {
     "inputs": {
-      "seed": 625407984301053,
+      "seed": 1079554962124930,
       "steps": 20,
       "cfg": 7,
-      "sampler_name": "dpmpp_2m",
-      "scheduler": "karras",
+      "sampler_name": "euler",
+      "scheduler": "normal",
       "denoise": 0.7000000000000001,
       "model": [
-        "14",
+        "4",
         0
       ],
       "positive": [
@@ -20,7 +20,7 @@
         0
       ],
       "latent_image": [
-        "12",
+        "11",
         0
       ]
     },
@@ -29,15 +29,36 @@
       "title": "K采样器"
     }
   },
+  "4": {
+    "inputs": {
+      "ckpt_name": "Counterfeit-V2.5_pruned.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Checkpoint加载器(简易)"
+    }
+  },
+  "5": {
+    "inputs": {
+      "from_translate": "chinese",
+      "to_translate": "english",
+      "text": "杰作，最好的质量，小女孩，黑色长发，抱着白猫，坐在院子里",
+      "speak_and_recognation": true
+    },
+    "class_type": "ArgosTranslateTextNode",
+    "_meta": {
+      "title": "翻译文本(Argos翻译)"
+    }
+  },
   "6": {
     "inputs": {
       "text": [
-        "18",
+        "5",
         0
       ],
       "speak_and_recognation": true,
       "clip": [
-        "14",
+        "4",
         1
       ]
     },
@@ -48,10 +69,10 @@
   },
   "7": {
     "inputs": {
-      "text": "badhandv4, EasyNegative, verybadimagenegative_v1.3,illustration, 3d, sepia, painting, cartoons, sketch, (worst quality:1.74), (low quality:1.74), (normal quality:1.44), lowres, bad anatomy, normal quality, ((monochrome)), ((grayscale)), ((letters)), ((english)), capital.",
+      "text": "lowres, bad anatomy, bad hands, text, error, missing fingers, extra digit, fewer digits, cropped, worst quality, low quality, normal quality, jpeg artifacts, signature, watermark, username, blurry",
       "speak_and_recognation": true,
       "clip": [
-        "14",
+        "4",
         1
       ]
     },
@@ -67,7 +88,7 @@
         0
       ],
       "vae": [
-        "14",
+        "4",
         2
       ]
     },
@@ -91,7 +112,7 @@
   },
   "10": {
     "inputs": {
-      "image": "fhj.png",
+      "image": "zl.png",
       "upload": "image"
     },
     "class_type": "LoadImage",
@@ -99,55 +120,20 @@
       "title": "加载图像"
     }
   },
-  "12": {
+  "11": {
     "inputs": {
       "pixels": [
         "10",
         0
       ],
       "vae": [
-        "14",
+        "4",
         2
       ]
     },
     "class_type": "VAEEncode",
     "_meta": {
       "title": "VAE编码"
-    }
-  },
-  "14": {
-    "inputs": {
-      "ckpt_name": "Counterfeit-V2.5_pruned.safetensors"
-    },
-    "class_type": "CheckpointLoaderSimple",
-    "_meta": {
-      "title": "Checkpoint加载器(简易)"
-    }
-  },
-  "18": {
-    "inputs": {
-      "from_translate": "chinese",
-      "to_translate": "english",
-      "text": "小女孩，白色衣服，白色头发",
-      "speak_and_recognation": true
-    },
-    "class_type": "ArgosTranslateTextNode",
-    "_meta": {
-      "title": "翻译文本(Argos翻译)"
-    }
-  },
-  "19": {
-    "inputs": {
-      "text": [
-        "18",
-        0
-      ],
-      "PreviewTextNode_0": "Little girl, white clothes, white hair.",
-      "speak_and_recognation": true
-    },
-    "class_type": "PreviewTextNode",
-    "_meta": {
-      "title": "预览文本"
     }
   }
 }

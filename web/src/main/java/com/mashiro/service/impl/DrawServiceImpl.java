@@ -112,7 +112,6 @@ public class DrawServiceImpl implements DrawService {
         validateDrawRequest(drawDto);
         // 提示词
         String prompt = drawDto.getPrompt();
-
         // 生成任务ID
         String taskId = generateTaskId();
         // 获取用户ID
@@ -143,12 +142,71 @@ public class DrawServiceImpl implements DrawService {
     }
 
     /**
+     * 图生图接口
+     *
+     * @param drawDto
+     * @param uploadImage
+     * @return
+     */
+    @Override
+    public String img2img(DrawDto drawDto, MultipartFile uploadImage) {
+        // 参数校验
+        validateImg2ImgRequest(drawDto, uploadImage);
+        // 提示词
+        String prompt = drawDto.getPrompt();
+        // 生成任务ID
+        String taskId = generateTaskId();
+        // 获取用户ID
+        int loginUserId = StpUtil.getLoginIdAsInt();
+        log.info("用户ID: {}, 提交图生图任务，任务ID: {}", loginUserId, taskId);
+
+        try {
+            // 处理上传图片
+            String uploadedImagePath = handleUploadedImage(uploadImage, taskId);
+            // 准备工作流
+            BaseFlowWork baseFlowWork = BaseFlowWork.IMG2IMG;
+            // 获取工作流, 并替换工作流里面的默认提示词和默认文件
+            ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath, prompt);
+            // 获取反向提示词
+            String negativePrompt = getNegativePrompt(flow);
+            // 提交任务
+            submitDrawingTask(flow, taskId);
+            String imageUrl = processTaskResult(taskId);
+
+            // 保存绘图记录
+            saveDrawRecord(drawDto, negativePrompt, imageUrl, loginUserId, taskId, baseFlowWork);
+            return imageUrl;
+        } catch (InterruptedException e) {
+            log.error("图生图任务执行被中断，userId: {}, taskId: {}", loginUserId, taskId, e);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        } catch (Exception e) {
+            log.error("图生图失败，userId: {}, taskId: {}", loginUserId, taskId, e);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
+    }
+
+    /**
      * 验证文生图请求参数
      *
      * @param drawDto
      */
     private void validateDrawRequest(DrawDto drawDto) {
         if (!StringUtils.hasText(drawDto.getPrompt())) {
+            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
+        }
+    }
+
+    /**
+     * 校验图生图请求参数
+     *
+     * @param drawDto
+     * @param uploadImage
+     */
+    private void validateImg2ImgRequest(DrawDto drawDto, MultipartFile uploadImage) {
+        if (!StringUtils.hasText(drawDto.getPrompt())) {
+            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
+        }
+        if (uploadImage == null || uploadImage.isEmpty()) {
             throw new DrawException(ResultCodeEnum.PARAM_ERROR);
         }
     }
@@ -182,61 +240,6 @@ public class DrawServiceImpl implements DrawService {
 
 
     /**
-     * 图生图接口
-     *
-     * @param drawDto
-     * @param uploadImage
-     * @return
-     */
-    @Override
-    public String img2img(DrawDto drawDto, MultipartFile uploadImage) {
-        validateImg2ImgRequest(drawDto, uploadImage);
-        String prompt = drawDto.getPrompt();
-
-        String taskId = generateTaskId();
-        int loginUserId = StpUtil.getLoginIdAsInt();
-        log.info("用户ID: {}, 提交图生图任务，任务ID: {}", loginUserId, taskId);
-
-        try {
-            // 处理上传图片
-            String uploadedImagePath = handleUploadedImage(uploadImage, taskId);
-
-            // 将工作流写死为 IMG2IMG
-            BaseFlowWork baseFlowWork = BaseFlowWork.IMG2IMG;
-            ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath, prompt);
-            // 获取反向提示词
-            String negativePrompt = getNegativePrompt(flow);
-            submitDrawingTask(flow, taskId);
-            String imageUrl = processTaskResult(taskId);
-
-            // 保存绘图记录
-            saveDrawRecord(drawDto, negativePrompt, imageUrl, loginUserId, taskId, baseFlowWork);
-            return imageUrl;
-        } catch (InterruptedException e) {
-            log.error("图生图任务执行被中断，userId: {}, taskId: {}", loginUserId, taskId, e);
-            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
-        } catch (Exception e) {
-            log.error("图生图失败，userId: {}, taskId: {}", loginUserId, taskId, e);
-            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
-        }
-    }
-
-    /**
-     * 校验图生图请求参数
-     *
-     * @param drawDto
-     * @param uploadImage
-     */
-    private void validateImg2ImgRequest(DrawDto drawDto, MultipartFile uploadImage) {
-        if (!StringUtils.hasText(drawDto.getPrompt())) {
-            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
-        }
-        if (uploadImage == null || uploadImage.isEmpty()) {
-            throw new DrawException(ResultCodeEnum.PARAM_ERROR);
-        }
-    }
-
-    /**
      * 处理上传的图片
      *
      * @param uploadImage
@@ -245,15 +248,20 @@ public class DrawServiceImpl implements DrawService {
      */
     private String handleUploadedImage(MultipartFile uploadImage, String taskId) {
         try {
+            // 获取原始文件名
             String originalFilename = uploadImage.getOriginalFilename();
+            // 获取文件扩展名
             String fileExtension = StringUtils.getFilenameExtension(originalFilename);
+            // 生成保存的文件名
             String savedFileName = taskId + "." + fileExtension;
 
             // 保存上传的图片到指定目录
             Path destinationPath = Paths.get(comfyUiProperties.getInputPath(), savedFileName);
+            // 创建父目录
             Files.createDirectories(destinationPath.getParent());
+            // 保存文件
             uploadImage.transferTo(destinationPath.toFile());
-
+            // 返回保存的文件名
             return savedFileName;
         } catch (IOException e) {
             log.error("图片上传处理失败", e);
@@ -277,17 +285,18 @@ public class DrawServiceImpl implements DrawService {
         }
 
         // 更新工作流中的图片加载节点
-        ComfyWorkFlowNode node10 = flow.getNode("10");
-        if (node10 != null) {
-            node10.getInputs().put("image", uploadedImagePath);
+        ComfyWorkFlowNode imageNode = flow.getNode("10");
+        if (imageNode != null) {
+            imageNode.getInputs().put("image", uploadedImagePath);
         } else {
-            log.warn("工作流中未找到ID为 '10' 的图片加载节点");
+            log.warn("工作流中未找到imageNode的图片加载节点");
         }
 
         // 配置随机种子
         configureRandomSeed(flow);
-        ComfyWorkFlowNode node18 = flow.getNode(18);
-        node18.getInputs().put("text", prompt);
+        // 替换工作流里面的默认提示词
+        ComfyWorkFlowNode promptNode = flow.getNode(5);
+        promptNode.getInputs().put("text", prompt);
         return flow;
     }
 
