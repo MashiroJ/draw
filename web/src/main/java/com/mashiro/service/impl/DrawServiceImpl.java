@@ -108,17 +108,26 @@ public class DrawServiceImpl implements DrawService {
      */
     @Override
     public String text2img(DrawDto drawDto) {
+        // 参数校验
         validateDrawRequest(drawDto);
+        // 提示词
         String prompt = drawDto.getPrompt();
 
+        // 生成任务ID
         String taskId = generateTaskId();
+        // 获取用户ID
         int loginUserId = StpUtil.getLoginIdAsInt();
         log.info("用户ID: {}, 提交任务，任务ID: {}", loginUserId, taskId);
 
         try {
+            // 准备工作流
             BaseFlowWork baseFlowWork = BaseFlowWork.TEXT2IMG;
+            // 获取工作流, 并替换工作流里面的默认提示词
             ComfyWorkFlow flow = prepareWorkFlow(baseFlowWork, prompt);
-            String negativePrompt = submitDrawingTask(flow, taskId);
+            // 获取反向提示词
+            String negativePrompt = getNegativePrompt(flow);
+            // 提交任务
+            submitDrawingTask(flow, taskId);
             String imageUrl = processTaskResult(taskId);
 
             // 保存绘图记录
@@ -152,19 +161,20 @@ public class DrawServiceImpl implements DrawService {
      * @return
      */
     private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork, String prompt) {
+        // 获取工作流
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
-        log.info("获取文生图工作流: {}", flow);
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
-        //
-        ComfyWorkFlowNode node10 = flow.getNode("10");
-        if (node10 != null) {
-            node10.getInputs().put("text", prompt);
+        // 替换工作流里面的默认提示词
+        ComfyWorkFlowNode promptNode = flow.getNode("10");
+        if (promptNode != null) {
+            promptNode.getInputs().put("text", prompt);
         } else {
-            log.warn("工作流中未找到ID为 '10' 的节点");
+            log.warn("工作流中未找到promptNode的节点");
         }
 
+        // 配置随机种子
         configureRandomSeed(flow);
         log.info("获取修改后的文生图工作流: {}", flow);
         return flow;
@@ -194,7 +204,9 @@ public class DrawServiceImpl implements DrawService {
             // 将工作流写死为 IMG2IMG
             BaseFlowWork baseFlowWork = BaseFlowWork.IMG2IMG;
             ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath, prompt);
-            String negativePrompt = submitDrawingTask(flow, taskId);
+            // 获取反向提示词
+            String negativePrompt = getNegativePrompt(flow);
+            submitDrawingTask(flow, taskId);
             String imageUrl = processTaskResult(taskId);
 
             // 保存绘图记录
@@ -299,13 +311,19 @@ public class DrawServiceImpl implements DrawService {
      * @param flow
      */
     private void configureRandomSeed(ComfyWorkFlow flow) {
-        ComfyWorkFlowNode node3 = flow.getNode("3");
-        if (node3 != null) {
-            node3.getInputs().put("seed", Math.abs(new Random().nextInt()));
+        ComfyWorkFlowNode seedNode = flow.getNode("3");
+        if (seedNode != null) {
+            seedNode.getInputs().put("seed", Math.abs(new Random().nextInt()));
         } else {
-            log.warn("工作流中未找到ID为 '3' 的节点");
+            log.warn("工作流中seedNode的节点");
         }
     }
+
+    private static String getNegativePrompt(ComfyWorkFlow flow) {
+        ComfyWorkFlowNode negativePromptNode = flow.getNode("7");
+        return (String) negativePromptNode.getInputs().get("text");
+    }
+
 
     /**
      * 获取negativePrompt信息，并提交任务
@@ -315,15 +333,10 @@ public class DrawServiceImpl implements DrawService {
      * @return
      * @throws InterruptedException
      */
-    private String submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
-        ComfyWorkFlowNode node7 = flow.getNode("7");
-        String negativePrompt = (String) node7.getInputs().get("text");
-
+    private void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
         DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
         taskSubmit.submit(drawingTaskInfo);
         Thread.sleep(TASK_WAIT_TIME);
-
-        return negativePrompt;
     }
 
     /**
