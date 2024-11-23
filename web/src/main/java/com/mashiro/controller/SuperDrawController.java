@@ -9,6 +9,7 @@ import com.mashiro.enums.ComfyUi.Sampler;
 import com.mashiro.enums.ComfyUi.Scheduler;
 import com.mashiro.result.Result;
 import com.mashiro.service.SuperDrawService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,12 +26,14 @@ public class SuperDrawController {
     @Resource
     SuperDrawService service;
 
+    @Operation(summary = "超级文生图")
     @PostMapping("text2img")
     public Result<String> superText2img(SuperDrawDto drawDto, ImageSize imageSize, Checkpoint checkpoint, Sampler sampler, Scheduler scheduler) throws InterruptedException {
         String superText2img = service.superText2img(drawDto, imageSize, checkpoint, sampler, scheduler);
         return Result.ok(superText2img);
     }
 
+    @Operation(summary = "超级图生图")
     @PostMapping("img2img")
     public Result<String> superImg2img(
 //            @RequestPart("drawDto") String drawDtoJson,

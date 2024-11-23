@@ -68,13 +68,13 @@ public class SuperDrawServiceImpl extends BaseDrawService implements SuperDrawSe
         img2ImgConfigureWorkflow(flow, superDrawDto, checkpoint, sampler, scheduler, uploadedImagePath);
         submitDrawingTask(flow, taskId);
         String superTextImgUrl = processTaskResult(taskId);
-        saveDrawRecord(userId, taskId, superDrawDto, superTextImgUrl, BaseFlowWork.SUPERTEXT2IMG);
+        saveDrawRecord(userId, taskId, superDrawDto, superTextImgUrl, BaseFlowWork.SUPERIMG2IMG);
         return superTextImgUrl;
     }
 
 
     /**
-     * 配置工作流
+     * 配置文生图工作流
      *
      * @param flow
      * @param superDrawDto
@@ -111,6 +111,16 @@ public class SuperDrawServiceImpl extends BaseDrawService implements SuperDrawSe
 
         log.info("更新后的文生图工作流{}", flow);
     }
+
+    /**
+     * 配置图生图工作流
+     * @param flow
+     * @param superDrawDto
+     * @param checkpoint
+     * @param sampler
+     * @param scheduler
+     * @param uploadedImagePath
+     */
 
     private void img2ImgConfigureWorkflow(ComfyWorkFlow flow, SuperDrawDto superDrawDto,
                                           Checkpoint checkpoint, Sampler sampler,
