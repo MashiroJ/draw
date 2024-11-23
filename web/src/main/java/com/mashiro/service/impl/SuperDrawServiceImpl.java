@@ -3,8 +3,7 @@ package com.mashiro.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import com.comfyui.common.entity.ComfyWorkFlow;
 import com.comfyui.common.entity.ComfyWorkFlowNode;
-import com.comfyui.queue.common.DrawingTaskInfo;
-import com.comfyui.queue.common.IDrawingTaskSubmit;
+import com.mashiro.config.comfyUi.WorkflowNodeConfig;
 import com.mashiro.dto.SuperDrawDto;
 import com.mashiro.enums.BaseFlowWork;
 import com.mashiro.enums.ComfyUi.Checkpoint;
@@ -13,140 +12,149 @@ import com.mashiro.enums.ComfyUi.Sampler;
 import com.mashiro.enums.ComfyUi.Scheduler;
 import com.mashiro.exception.DrawException;
 import com.mashiro.result.ResultCodeEnum;
-import com.mashiro.service.FileService;
 import com.mashiro.service.SuperDrawService;
-import com.mashiro.utils.ComfyUi.ComfyUiProperties;
-import com.mashiro.utils.TaskProcessMonitor.TaskProcessMonitor;
-import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import static com.mashiro.constant.UserConstant.DEFAULT_TASK_ID;
 
 @Slf4j
 @Service
-public class SuperDrawServiceImpl implements SuperDrawService {
+public class SuperDrawServiceImpl extends BaseDrawService implements SuperDrawService {
 
-    private static final int TASK_WAIT_TIME = 20000; // 20秒
-    private static final int TASK_TIMEOUT = 5; // 5分钟
-    final String QUALITY_PREFIX = "masterpiece, best quality,";
-
-
-    @Resource
-    private IDrawingTaskSubmit taskSubmit;
-    @Resource
-    private ResourceLoader resourceLoader;
-    @Resource
-    private TaskProcessMonitor taskProcessMonitor;
-    @Resource
-    private ComfyUiProperties comfyUiProperties;
-    @Resource
-    private FileService fileService;
-
-    public ComfyWorkFlow getFlow(String workFlowName) {
-        String flowName = workFlowName + ".json";
-        org.springframework.core.io.Resource resource = resourceLoader.getResource("classpath:" + flowName);
-        StringBuilder flowStr = new StringBuilder();
-
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(resource.getInputStream()))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                flowStr.append(line);
-            }
-        } catch (IOException e) {
-            log.error("读取工作流文件失败: {}", flowName, e);
-            return null;
-        }
-
-        return ComfyWorkFlow.of(flowStr.toString());
-    }
-
+    /**
+     * 超级文生图
+     *
+     * @param superDrawDto
+     * @param imageSize
+     * @param checkpoint
+     * @param sampler
+     * @param scheduler
+     * @return
+     * @throws InterruptedException
+     */
     @Override
-    public String superText2img(SuperDrawDto superDrawDto, ImageSize imageSize, Checkpoint checkpoint, Sampler sampler, Scheduler scheduler) throws InterruptedException {
-        // 生成任务ID
+    public String superText2img(SuperDrawDto superDrawDto, ImageSize imageSize,
+                                Checkpoint checkpoint, Sampler sampler,
+                                Scheduler scheduler) throws InterruptedException {
+        int userId = StpUtil.getLoginIdAsInt();
         String taskId = generateTaskId();
-        // 获取用户ID
-        int loginUserId = StpUtil.getLoginIdAsInt();
-        BaseFlowWork baseFlowWork = BaseFlowWork.SUPERTEXT2IMG;
-        // 获取工作流
-        ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
+
+        ComfyWorkFlow flow = getFlow(BaseFlowWork.SUPERTEXT2IMG.toString());
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
-        //配置采样器
-        ComfyWorkFlowNode KSampler = flow.getNode("3");
-        KSampler.getInputs().put("seed", Math.abs(new Random().nextInt()));
-        KSampler.getInputs().put("steps", superDrawDto.getSteps());
-        KSampler.getInputs().put("cfg", superDrawDto.getCfg());
-        KSampler.getInputs().put("sampler_name", sampler.getName());
-        KSampler.getInputs().put("scheduler", scheduler.getName());
-        KSampler.getInputs().put("denoise", superDrawDto.getDenoise());
-
-        // 替换工作流里面的模型
-        ComfyWorkFlowNode checkPoint = flow.getNode("4");
-        checkPoint.getInputs().put("ckpt_name", checkpoint.getName());
-
-        // 替换工作流里面的图片尺寸
-        ComfyWorkFlowNode imageNode = flow.getNode("5");
-        imageNode.getInputs().put("width", imageSize.getWidth());
-        imageNode.getInputs().put("height", imageSize.getHeight());
-        // 替换工作流里面的默认提示词
-        ComfyWorkFlowNode positive = flow.getNode("6");
-        positive.getInputs().put("text", QUALITY_PREFIX + superDrawDto.getPrompt());
-
-        // 替换工作流里面的反向提示词
-        ComfyWorkFlowNode negative = flow.getNode("7");
-        negative.getInputs().put("text", superDrawDto.getNegativePrompt());
-        log.info("更新后的工作流{}", flow);
-
+        text2ImgConfigureWorkflow(flow, superDrawDto, imageSize, checkpoint, sampler, scheduler);
         submitDrawingTask(flow, taskId);
-        String imageUrl = processTaskResult(taskId);
-
-        return imageUrl;
-
+        String superTextImgUrl = processTaskResult(taskId);
+        saveDrawRecord(userId, taskId, superDrawDto, superTextImgUrl, BaseFlowWork.SUPERTEXT2IMG);
+        return superTextImgUrl;
     }
 
-    private void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
-        DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
-        taskSubmit.submit(drawingTaskInfo);
-        Thread.sleep(TASK_WAIT_TIME);
-    }
+    @Override
+    public String superImg2img(SuperDrawDto superDrawDto, ImageSize imageSize,
+                               Checkpoint checkpoint, Sampler sampler,
+                               Scheduler scheduler, MultipartFile uploadImage) throws InterruptedException {
+        int userId = StpUtil.getLoginIdAsInt();
+        String taskId = generateTaskId();
+        String uploadedImagePath = handleUploadedImage(uploadImage, taskId);
 
-
-    private String generateTaskId() {
-        if (StpUtil.getLoginId() == null) {
-            throw new DrawException(ResultCodeEnum.APP_LOGIN_AUTH);
-        }
-        return String.valueOf(StpUtil.getLoginIdAsInt() + DEFAULT_TASK_ID);
-    }
-
-    private String processTaskResult(String taskId) {
-        String fileName = taskProcessMonitor.getTaskOutputFileName(taskId);
-        if (!StringUtils.hasText(fileName)) {
-            throw new DrawException(ResultCodeEnum.DATA_ERROR);
-        }
-
-        String fileUrl = buildFileUrl(fileName);
-        String url = fileService.uploadFromUrl(fileUrl);
-        if (!StringUtils.hasText(url)) {
+        ComfyWorkFlow flow = getFlow(BaseFlowWork.SUPERIMG2IMG.toString());
+        if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
-        return url;
+
+        img2ImgConfigureWorkflow(flow, superDrawDto, checkpoint, sampler, scheduler, uploadedImagePath);
+        submitDrawingTask(flow, taskId);
+        String superTextImgUrl = processTaskResult(taskId);
+        saveDrawRecord(userId, taskId, superDrawDto, superTextImgUrl, BaseFlowWork.SUPERTEXT2IMG);
+        return superTextImgUrl;
     }
 
-    private String buildFileUrl(String fileName) {
-        return String.format("http://%s:%s/view?filename=%s&type=output&preview=WEBP",
-                comfyUiProperties.getHost(),
-                comfyUiProperties.getPort(),
-                fileName);
+
+    /**
+     * 配置工作流
+     *
+     * @param flow
+     * @param superDrawDto
+     * @param imageSize
+     * @param checkpoint
+     * @param sampler
+     * @param scheduler
+     */
+    private void text2ImgConfigureWorkflow(ComfyWorkFlow flow, SuperDrawDto superDrawDto,
+                                           ImageSize imageSize, Checkpoint checkpoint,
+                                           Sampler sampler, Scheduler scheduler) {
+
+        WorkflowNodeConfig nodeConfig = WorkflowNodeConfig.superText2ImgConfig();
+        // 配置采样器
+        ComfyWorkFlowNode kSampler = flow.getNode(nodeConfig.getKSamplerId());
+        configureKSampler(kSampler, superDrawDto, sampler, scheduler);
+
+        // 配置模型
+        ComfyWorkFlowNode checkPoint = flow.getNode(nodeConfig.getCheckPointId());
+        checkPoint.getInputs().put("ckpt_name", checkpoint.getName());
+
+        // 配置图片尺寸
+        ComfyWorkFlowNode imageNode = flow.getNode(nodeConfig.getImageNodeId());
+        imageNode.getInputs().put("width", imageSize.getWidth());
+        imageNode.getInputs().put("height", imageSize.getHeight());
+
+        // 配置提示词
+        ComfyWorkFlowNode positive = flow.getNode(nodeConfig.getPositiveId());
+        positive.getInputs().put("text", QUALITY_PREFIX + superDrawDto.getPrompt());
+
+        // 配置反向提示词
+        ComfyWorkFlowNode negative = flow.getNode(nodeConfig.getNegativeId());
+        negative.getInputs().put("text", superDrawDto.getNegativePrompt());
+
+        log.info("更新后的文生图工作流{}", flow);
+    }
+
+    private void img2ImgConfigureWorkflow(ComfyWorkFlow flow, SuperDrawDto superDrawDto,
+                                          Checkpoint checkpoint, Sampler sampler,
+                                          Scheduler scheduler, String uploadedImagePath) {
+
+        WorkflowNodeConfig nodeConfig = WorkflowNodeConfig.superImg2ImgConfig();
+        // 配置采样器
+        ComfyWorkFlowNode kSampler = flow.getNode(nodeConfig.getKSamplerId());
+        configureKSampler(kSampler, superDrawDto, sampler, scheduler);
+
+        // 配置模型
+        ComfyWorkFlowNode checkPoint = flow.getNode(nodeConfig.getCheckPointId());
+        checkPoint.getInputs().put("ckpt_name", checkpoint.getName());
+
+        ComfyWorkFlowNode inputImage = flow.getNode(nodeConfig.getInputImageId());
+        inputImage.getInputs().put("image", uploadedImagePath);
+
+
+        // 配置提示词
+        ComfyWorkFlowNode positive = flow.getNode(nodeConfig.getPositiveId());
+        positive.getInputs().put("text", QUALITY_PREFIX + superDrawDto.getPrompt());
+
+        // 配置反向提示词
+        ComfyWorkFlowNode negative = flow.getNode(nodeConfig.getNegativeId());
+        negative.getInputs().put("text", superDrawDto.getNegativePrompt());
+
+        log.info("更新后的图生图工作流{}", flow);
+    }
+
+    /**
+     * 配置采样器
+     *
+     * @param kSampler
+     * @param superDrawDto
+     * @param sampler
+     * @param scheduler
+     */
+    private void configureKSampler(ComfyWorkFlowNode kSampler, SuperDrawDto superDrawDto,
+                                   Sampler sampler, Scheduler scheduler) {
+        kSampler.getInputs().put("seed", Math.abs(new Random().nextInt()));
+        kSampler.getInputs().put("steps", superDrawDto.getSteps());
+        kSampler.getInputs().put("cfg", superDrawDto.getCfg());
+        kSampler.getInputs().put("sampler_name", sampler.getName());
+        kSampler.getInputs().put("scheduler", scheduler.getName());
+        kSampler.getInputs().put("denoise", superDrawDto.getDenoise());
     }
 }
-
