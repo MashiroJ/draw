@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 import static com.mashiro.constant.UserConstant.DEFAULT_AVATAR_URL;
 
@@ -36,6 +38,9 @@ import static com.mashiro.constant.UserConstant.DEFAULT_AVATAR_URL;
 @RestController
 @RequestMapping("/system/user")
 public class UserController {
+
+    // 用于记录签到时间的缓存
+    private final ConcurrentHashMap<Long, Long> signInCache = new ConcurrentHashMap<>();
 
     @Resource
     private UserService userService;
@@ -295,6 +300,7 @@ public class UserController {
 
     /**
      * 修改当前用户的密码
+     *
      * @param updatePasswordDto
      * @return
      */

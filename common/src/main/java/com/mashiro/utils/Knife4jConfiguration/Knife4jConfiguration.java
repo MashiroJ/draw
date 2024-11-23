@@ -80,4 +80,13 @@ public class Knife4jConfiguration {
                 pathsToMatch("/system/super/draw/**").
                 build();
     }
+
+    @Bean
+    public GroupedOpenApi pointsAPI() {
+        return GroupedOpenApi.builder().group("积分管理").
+                pathsToMatch("/system/points/**").
+                build();
+    }
+
+
 }

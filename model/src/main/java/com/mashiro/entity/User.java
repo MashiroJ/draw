@@ -38,4 +38,9 @@ public class User extends BaseEntity {
      * 用户状态：1正常，0禁用
      */
     private BaseStatus status;
+
+    /**
+     * 积分
+     */
+    private Integer points;
 }
