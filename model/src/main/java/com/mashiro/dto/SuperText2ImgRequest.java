@@ -10,7 +10,6 @@ public class SuperText2ImgRequest {
     private Integer sampler;
     private Integer scheduler;
 
-    // Getters and Setters
 
     @Override
     public String toString() {
