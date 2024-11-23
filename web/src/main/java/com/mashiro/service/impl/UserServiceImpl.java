@@ -7,10 +7,12 @@ import com.mashiro.dto.RegisterDto;
 import com.mashiro.entity.User;
 import com.mashiro.enums.BaseRole;
 import com.mashiro.enums.BaseStatus;
+import com.mashiro.exception.DrawException;
 import com.mashiro.mapper.MenuMapper;
 import com.mashiro.mapper.RoleMapper;
 import com.mashiro.mapper.RoleMenuMapper;
 import com.mashiro.mapper.UserMapper;
+import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.UserService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static com.mashiro.constant.UserConstant.DEFAULT_MUSER_POINTS;
+import static com.mashiro.constant.UserConstant.DEFAULT_USER_POINTS;
 
 /**
  * @author mashiro
@@ -117,6 +122,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     public void grantRole(long userId, BaseRole roleId) {
         // 删除之前用户所对应的角色数据
         roleMapper.deleteByUserId(userId);
+        // 查询当前用户的积分
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            throw new DrawException(ResultCodeEnum.USER_NOT_FOUND);
+        }
+        Integer points = user.getPoints();
+        Integer code = roleId.getCode();
+        if (code == 1) {
+            return;
+        } else if (code == 2) {
+            Integer addPoint = points + DEFAULT_USER_POINTS;
+            userMapper.addPoint(userId, addPoint);
+        } else if (code == 3) {
+            Integer addPoint = points + DEFAULT_MUSER_POINTS;
+            userMapper.addPoint(userId, addPoint);
+        }
         // 分配新的角色数据
         roleMapper.grantRoleByid(userId, roleId);
     }

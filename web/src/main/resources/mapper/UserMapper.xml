@@ -25,6 +25,12 @@
         INSERT INTO sys_user (username, password, avatar_url, status)
         VALUES (#{username}, #{password}, #{avatarUrl}, #{status})
     </insert>
+    <insert id="addPoint">
+            update sys_user
+            set points = points + #{addPoint}
+            where id = #{userId}
+    </insert>
+
 
     <select id="selectOneByUsername" resultType="com.mashiro.entity.User">
         select id,

@@ -17,6 +17,8 @@ public interface UserMapper extends BaseMapper<User> {
     User selectOneByUsername(String username);
 
     void registerUser(User user);
+
+    void addPoint(long userId, Integer addPoint);
 }
 
 

@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static com.mashiro.constant.UserConstant.DEFAULT_AVATAR_URL;
+import static com.mashiro.constant.UserConstant.DEFAULT_POINTS;
 
 @Tag(name = "用户管理")
 @Slf4j
@@ -141,6 +142,8 @@ public class UserController {
         user.setAvatarUrl(DEFAULT_AVATAR_URL);
         // 设置默认状态为启用
         user.setStatus(BaseStatus.ENABLE);
+        // 设置默认积分
+        user.setPoints(DEFAULT_POINTS);
         // 保存用户
         if (userService.save(user)) {
             // 获取新用户的ID,并授权普通角色

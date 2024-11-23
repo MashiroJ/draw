@@ -14,6 +14,8 @@ import com.mashiro.result.Result;
 import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.DrawService;
 import com.mashiro.service.FileService;
+import com.mashiro.service.PointsService;
+import com.mashiro.service.UserService;
 import com.mashiro.utils.ComfyUi.ComfyUiProperties;
 import com.mashiro.utils.TaskProcessMonitor.TaskProcessMonitor;
 import jakarta.annotation.Resource;
