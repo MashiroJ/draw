@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-@Tag(name = "SuperDraw", description = "AI绘画")
+@Tag(name = "超级绘画", description = "AI绘画")
 @RestController
 @RequestMapping("/system/super/draw/")
 public class SuperDrawController {
