@@ -4,9 +4,9 @@
       "seed": 1079554962124930,
       "steps": 20,
       "cfg": 7,
-      "sampler_name": "euler",
-      "scheduler": "normal",
-      "denoise": 0.7000000000000001,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 0.3000000000000001,
       "model": [
         "4",
         0
