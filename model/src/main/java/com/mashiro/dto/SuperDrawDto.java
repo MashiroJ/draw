@@ -18,7 +18,7 @@ public class SuperDrawDto {
     @Schema(description = "cfg", example = "7")
     private Integer cfg;
 
-    @Schema(description = "去噪程度", example = "0.7")
+    @Schema(description = "去噪程度", example = "0.3")
     private double denoise;
 
     @Schema(description = "是否公开：1公开，0私有")
