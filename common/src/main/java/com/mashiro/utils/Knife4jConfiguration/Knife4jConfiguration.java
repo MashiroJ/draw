@@ -88,5 +88,10 @@ public class Knife4jConfiguration {
                 build();
     }
 
-
+    @Bean
+    public GroupedOpenApi commentAPI() {
+        return GroupedOpenApi.builder().group("绘画评论管理").
+                pathsToMatch("/system/comment/**").
+                build();
+    }
 }

@@ -47,7 +47,8 @@ public enum ResultCodeEnum {
     ADMIN_PASSWORD_ERROR(605, "密码错误" ),
     PASSWORD_MISMATCH(606, "密码不匹配" ),
     USER_NOT_FOUND(607, "用户不存在" ),
-    DRAW_NOT_EXISTS(608, "绘画记录不存在" );
+    DRAW_NOT_EXISTS(608, "绘画记录不存在" ),
+    COMMENT_EXIST_ERROR(701,"已经点赞过了");
 
 
     private final Integer code;

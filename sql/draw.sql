@@ -454,3 +454,37 @@ VALUES (1, 1, 1, '2024-11-19 22:36:52', '2024-11-25 21:20:55', 0),
        (31, 24, 3, '2024-11-25 21:23:25', '2024-11-25 21:23:24', 0),
        (32, 31, 3, '2024-11-25 21:23:27', '2024-11-25 21:23:26', 0),
        (33, 30, 7, '2024-11-25 22:57:50', '2024-11-25 22:57:50', 0);
+
+-- 绘画评论表
+CREATE TABLE `draw_comment` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评论ID',
+    `draw_id` bigint NOT NULL COMMENT '绘画记录ID',
+    `user_id` int NOT NULL COMMENT '评论用户ID',
+    `content` text NOT NULL COMMENT '评论内容',
+    `parent_id` bigint DEFAULT NULL COMMENT '父评论ID，用于回复功能',
+    `reply_user_id` int DEFAULT NULL COMMENT '被回复的用户ID',
+    `like_count` int DEFAULT '0' COMMENT '点赞数',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `is_deleted` tinyint DEFAULT '0' COMMENT '是否删除：0未删除，1已删除',
+    PRIMARY KEY (`id`),
+    KEY `idx_draw_id` (`draw_id`),
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_parent_id` (`parent_id`),
+    KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='绘画评论表';
+
+-- 评论点赞表
+CREATE TABLE `comment_like` (
+    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '点赞ID',
+    `comment_id` bigint NOT NULL COMMENT '评论ID',
+    `user_id` int NOT NULL COMMENT '用户ID',
+    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `is_deleted` tinyint DEFAULT '0' COMMENT '是否删除：0未删除，1已删除',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `unique_user_comment` (`user_id`, `comment_id`),
+    KEY `idx_comment_id` (`comment_id`),
+    KEY `idx_user_id` (`user_id`),
+    KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论点赞表';
