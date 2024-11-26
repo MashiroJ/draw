@@ -10,10 +10,8 @@ import java.time.LocalDateTime;
 
 @Data
 @TableName("draw_comment")
-public class DrawComment {
-    @TableId(type = IdType.AUTO)
-    private Long id;
-    
+public class DrawComment extends BaseEntity{
+
     private Long drawId;
     
     private Integer userId;
@@ -25,11 +23,4 @@ public class DrawComment {
     private Integer replyUserId;
     
     private Integer likeCount;
-    
-    private LocalDateTime createTime;
-    
-    private LocalDateTime updateTime;
-    
-    @TableLogic
-    private Integer isDeleted;
 } 
