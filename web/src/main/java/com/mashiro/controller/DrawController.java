@@ -1,5 +1,7 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import com.comfyui.common.entity.ComfyWorkFlow;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,6 +31,7 @@ public class DrawController {
     @Resource
     private PointsService pointsService;
 
+    @SaCheckLogin
     @GetMapping("getFlow")
     @Operation(summary = "获取工作流")
     public Result getFlow(String workFlowName) {
@@ -36,6 +39,7 @@ public class DrawController {
         return Result.ok(flow);
     }
 
+    @SaCheckPermission("gallery:view")
     @Operation(summary = "查看图片")
     @GetMapping("viewImg")
     public Result viewImg(String taskId) {
@@ -45,10 +49,8 @@ public class DrawController {
 
     /**
      * 文生图提交任务
-     *
-     * @param drawDto 绘图参数
-     * @return
      */
+    @SaCheckPermission("text2img:basic")
     @Operation(summary = "文生图")
     @PostMapping("text2img")
     public Result<String> text2img(@RequestBody DrawDto drawDto) {
@@ -61,11 +63,8 @@ public class DrawController {
 
     /**
      * 图生图提交任务
-     *
-     * @param drawDto
-     * @param uploadImage
-     * @return
      */
+    @SaCheckPermission("img2img:basic")
     @Operation(summary = "图生图")
     @PostMapping("img2img")
     public Result<String> img2img(
