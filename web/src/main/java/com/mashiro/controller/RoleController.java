@@ -1,5 +1,6 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mashiro.entity.Role;
 import com.mashiro.enums.BaseStatus;
@@ -27,9 +28,8 @@ public class RoleController {
 
     /**
      * 获取角色列表
-     *
-     * @return
      */
+    @SaCheckPermission("sysRole:view")
     @Operation(summary = "获取角色列表")
     @GetMapping("list")
     public Result listRole() {
@@ -39,10 +39,8 @@ public class RoleController {
 
     /**
      * 保存或更新角色信息并关联菜单
-     *
-     * @param role
-     * @return
      */
+    @SaCheckPermission("sysRole:add")
     @Operation(summary = "保存或更新角色信息并关联菜单")
     @PostMapping("saveOrUpdate")
     @Transactional
@@ -64,6 +62,10 @@ public class RoleController {
         return Result.ok();
     }
 
+    /**
+     * 更新角色状态
+     */
+    @SaCheckPermission("sysRole:edit")
     @Operation(summary = "更新角色状态")
     @PostMapping("updateStatus")
     public Result updateStatus(@RequestParam long id, @RequestParam BaseStatus status) {
@@ -74,13 +76,10 @@ public class RoleController {
         return Result.ok();
     }
 
-
     /**
      * 删除角色
-     *
-     * @param id
-     * @return
      */
+    @SaCheckPermission("sysRole:delete")
     @Operation(summary = "删除角色")
     @DeleteMapping("removeById")
     public Result removeRole(@RequestParam Integer id) {
@@ -90,10 +89,8 @@ public class RoleController {
 
     /**
      * 查询当前角色所拥有的菜单
-     *
-     * @param roleId
-     * @return
      */
+    @SaCheckPermission("sysRole:view")
     @Operation(summary = "查询当前角色所拥有的菜单")
     @GetMapping("getMenuIdsByRoleId")
     public Result<Map<String, Object>> getMenuIdsByRoleId(@RequestParam Long roleId) {
