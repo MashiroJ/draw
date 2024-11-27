@@ -1,5 +1,7 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import com.mashiro.dto.SuperDrawDto;
 import com.mashiro.dto.SuperText2ImgRequest;
@@ -29,6 +31,10 @@ public class SuperDrawController {
     @Resource
     private PointsService pointsService;
 
+    /**
+     * 超级文生图
+     */
+    @SaCheckPermission("text2img:advanced")
     @Operation(summary = "超级文生图")
     @PostMapping("text2img")
     public Result<String> superText2img(@RequestBody SuperText2ImgRequest request) throws InterruptedException {
@@ -44,7 +50,10 @@ public class SuperDrawController {
         return Result.ok(result);
     }
 
-
+    /**
+     * 超级图生图
+     */
+    @SaCheckPermission("img2img:advanced")
     @Operation(summary = "超级图生图")
     @PostMapping("img2img")
     public Result<String> superImg2img(
