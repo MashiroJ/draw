@@ -1,5 +1,6 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import com.mashiro.result.Result;
 import com.mashiro.service.FileService;
 import io.minio.errors.*;
@@ -19,6 +20,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 
 @Tag(name = "文件管理")
+@SaCheckLogin
 @RequestMapping("/system/file")
 @RestController
 public class FileController {
@@ -26,34 +28,18 @@ public class FileController {
     private FileService fileService;
 
     /**
-     * /**
      * 上传文件方法
-     * 该方法负责接收上传的文件，并返回文件的URL
-     *
-     * @param file 通过@RequestParam注解接收的上传文件，直接从请求中获取
-     * @param file
-     * @return 返回一个Result对象，包含文件的URL
-     * @return
-     * @throws ServerException
-     * @throws InsufficientDataException
-     * @throws ErrorResponseException
-     * @throws IOException
-     * @throws NoSuchAlgorithmException
-     * @throws InvalidKeyException
-     * @throws InvalidResponseException
-     * @throws XmlParserException
-     * @throws InternalException
      */
     @Operation(summary = "上传文件")
     @PostMapping("upload")
     public Result<String> upload(@RequestPart(required = false) MultipartFile file) throws ServerException, InsufficientDataException, ErrorResponseException, IOException, NoSuchAlgorithmException, InvalidKeyException, InvalidResponseException, XmlParserException, InternalException {
-        // 调用fileService的upload方法，上传文件并获取文件的URL
         String url = fileService.upload(file);
-        // 返回一个成功的Result对象，包含文件的URL
         return Result.ok(url);
     }
 
-    // 通过 URL 上传文件接口
+    /**
+     * 通过URL上传文件
+     */
     @Operation(summary = "通过URL上传文件")
     @PostMapping("/uploadByUrl")
     public Result<String> uploadByUrl(@RequestParam String fileUrl) {
@@ -63,10 +49,8 @@ public class FileController {
 
     /**
      * 删除文件
-     *
-     * @param objectName
-     * @return
      */
+    @Operation(summary = "删除文件")
     @DeleteMapping("/delete")
     public String deleteImage(@RequestParam String objectName) {
         try {
@@ -79,11 +63,8 @@ public class FileController {
 
     /**
      * 获取文件流
-     *
-     * @param objectName
-     * @return
      */
-
+    @Operation(summary = "获取文件")
     @GetMapping("/view")
     public ResponseEntity<InputStreamResource> viewFile(@RequestParam String objectName) {
         try {
@@ -96,6 +77,4 @@ public class FileController {
                     .body(null);
         }
     }
-
-
 }
