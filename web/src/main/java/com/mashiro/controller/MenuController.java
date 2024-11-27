@@ -1,5 +1,6 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.mashiro.entity.Menu;
 import com.mashiro.result.Result;
@@ -22,7 +23,7 @@ public class MenuController {
     /**
      * 获取菜单列表
      */
-    @SaCheckPermission("sysMenu:view")
+    @SaCheckLogin
     @GetMapping("list")
     @Operation(summary = "获取菜单列表")
     public Result listMenu() {

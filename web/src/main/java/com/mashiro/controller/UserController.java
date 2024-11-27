@@ -64,7 +64,7 @@ public class UserController {
         return Result.ok(user);
     }
 
-    @SaCheckPermission("sysUser:view")
+    @SaCheckLogin
     @Operation(summary = "根据Id获取用户信息")
     @GetMapping("/userInfoById")
     public Result<User> userInfoById(@RequestParam long id) {
