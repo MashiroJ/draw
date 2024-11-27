@@ -1,5 +1,6 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.stp.StpUtil;
 import com.mashiro.result.Result;
 import com.mashiro.service.PointsService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "积分管理")
 @Slf4j
+@SaCheckLogin
 @RestController
 @RequestMapping("/system/points/")
 public class PointsController {
