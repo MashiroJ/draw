@@ -1,5 +1,7 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
@@ -53,6 +55,7 @@ public class UserController {
      *
      * @return 包含用户信息的 Result 对象
      */
+    @SaCheckLogin
     @Operation(summary = "获取当前登录用户信息")
     @GetMapping("/userInfo")
     public Result<User> userInfo() {
@@ -61,6 +64,7 @@ public class UserController {
         return Result.ok(user);
     }
 
+    @SaCheckPermission("sysUser:view")
     @Operation(summary = "根据Id获取用户信息")
     @GetMapping("/userInfoById")
     public Result<User> userInfoById(@RequestParam long id) {
@@ -76,6 +80,7 @@ public class UserController {
      * @param user    包含查询条件的用户对象
      * @return 分页查询结果
      */
+    @SaCheckPermission("sysUser:view")
     @Operation(summary = "分页查询用户信息")
     @GetMapping("/page")
     public Result<IPage<User>> pageInfo(@RequestParam long current, @RequestParam long size, User user) {
@@ -125,6 +130,7 @@ public class UserController {
      * @param user 用户信息对象
      * @return 执行操作的结果
      */
+    @SaCheckPermission("sysUser:add")
     @Operation(summary = "新增用户信息")
     @PostMapping("/save")
     public Result save(@RequestBody User user) {
@@ -165,6 +171,7 @@ public class UserController {
      * @param user
      * @return
      */
+    @SaCheckPermission("sysUser:edit")
     @Operation(summary = "更新用户信息")
     @PatchMapping("/updateUser")
     @Transactional
@@ -187,6 +194,7 @@ public class UserController {
      * @param id 用户ID
      * @return 执行操作的结果
      */
+    @SaCheckPermission("sysUser:delete")
     @Operation(summary = "根据用户ID删除用户")
     @DeleteMapping("/deleteById")
     public Result removeUser(@RequestParam long id) {
@@ -200,6 +208,7 @@ public class UserController {
      * @param avatarUrl 新的头像URL
      * @return 执行操作的结果
      */
+    @SaCheckLogin
     @Operation(summary = "更新当前用户头像")
     @PatchMapping("/updateAvatar")
     public Result updateAvatar(@RequestParam String avatarUrl) {
@@ -236,6 +245,7 @@ public class UserController {
      * @param roleId 要分配的角色
      * @return 执行操作的结果
      */
+    @SaCheckPermission("sysRole:edit")
     @Operation(summary = "为用户分配角色")
     @PostMapping("/grantRole")
     public Result<Void> grantRole(@RequestParam long userId, @RequestParam BaseRole roleId) {
@@ -250,6 +260,7 @@ public class UserController {
      * @param roleId 角色ID
      * @return 执行操作的结果
      */
+    @SaCheckPermission("sysRole:edit")
     @Operation(summary = "删除用户的指定角色")
     @DeleteMapping("/deleteRole")
     public Result<Void> deleteRole(@RequestParam Long userId, @RequestParam BaseRole roleId) {
@@ -263,6 +274,7 @@ public class UserController {
      * @param userId 用户ID
      * @return 用户拥有的角色信息
      */
+    @SaCheckPermission("sysRole:view")
     @Operation(summary = "查询用户拥有的角色")
     @GetMapping("/getRoleIdsByUserId")
     public Result getRoleIdsByUserId(@RequestParam Long userId) {
@@ -282,6 +294,7 @@ public class UserController {
      * @param userId 用户ID
      * @return 用户拥有的菜单信息
      */
+    @SaCheckPermission("sysMenu:view")
     @Operation(summary = "查询用户拥有的菜单")
     @GetMapping("/getMenuIdsByUserId")
     public Result<Map<String, Object>> getMenuIdsByUserId(@RequestParam Long userId) {
@@ -295,6 +308,7 @@ public class UserController {
      * @param userId
      * @return
      */
+    @SaCheckPermission("sysRole:view")
     @Operation(summary = "查询用户拥有的权限")
     @GetMapping("/getPermissions")
     public List<String> getPermissions(@RequestParam Long userId) {
@@ -307,6 +321,7 @@ public class UserController {
      * @param updatePasswordDto
      * @return
      */
+    @SaCheckLogin
     @Operation(summary = "修改当前用户的密码")
     @PostMapping("/updatePassword")
     public Result updatePassword(@RequestBody @Validate UpdatePasswordDto updatePasswordDto) {
