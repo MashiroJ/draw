@@ -100,13 +100,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 
         // 通过角色ID获取相关联的菜单
         for (Long roleId : roleByUserId) {
-            List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
-            // 限制每个角色获取的菜单数量为9
-            List<Long> MenuIds = roleMenuIds.stream().limit(9).toList();
-            log.info("通过角色ID获取相关联的菜单：" + MenuIds);
-            allRoleMenuIds.addAll(MenuIds);
+            if (roleId == 1) {
+                List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
+                List<Long> MenuIds = roleMenuIds.stream().limit(9).toList();
+                allRoleMenuIds.addAll(MenuIds);
+            } else if (roleId == 2) {
+                List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
+                List<Long> MenuIds = roleMenuIds.stream().limit(6).toList();
+                allRoleMenuIds.addAll(MenuIds);
+            } else if (roleId == 3) {
+                List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
+                List<Long> MenuIds = roleMenuIds.stream().limit(4).toList();
+                allRoleMenuIds.addAll(MenuIds);
+            }
         }
-
         // 将所有菜单ID存储到Map中进行返回
         result.put("roleMenuIds", allRoleMenuIds);
         return result;
