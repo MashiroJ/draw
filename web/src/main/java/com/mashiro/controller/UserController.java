@@ -294,7 +294,7 @@ public class UserController {
      * @param userId 用户ID
      * @return 用户拥有的菜单信息
      */
-    @SaCheckPermission("sysMenu:view")
+    @SaCheckLogin
     @Operation(summary = "查询用户拥有的菜单")
     @GetMapping("/getMenuIdsByUserId")
     public Result<Map<String, Object>> getMenuIdsByUserId(@RequestParam Long userId) {
