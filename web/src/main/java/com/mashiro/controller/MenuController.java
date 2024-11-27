@@ -1,5 +1,6 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.mashiro.entity.Menu;
 import com.mashiro.result.Result;
 import com.mashiro.service.MenuService;
@@ -20,9 +21,8 @@ public class MenuController {
 
     /**
      * 获取菜单列表
-     *
-     * @return
      */
+    @SaCheckPermission("sysMenu:view")
     @GetMapping("list")
     @Operation(summary = "获取菜单列表")
     public Result listMenu() {
@@ -32,10 +32,8 @@ public class MenuController {
 
     /**
      * 添加或更新菜单
-     *
-     * @param menu
-     * @return
      */
+    @SaCheckPermission("sysMenu:add")
     @PostMapping("saveOrUpdate")
     @Operation(summary = "保存或更新菜单")
     public Result saveOrUpdate(@RequestBody Menu menu) {
@@ -45,10 +43,8 @@ public class MenuController {
 
     /**
      * 删除菜单
-     *
-     * @param id
-     * @return
      */
+    @SaCheckPermission("sysMenu:delete")
     @DeleteMapping("removeById")
     @Operation(summary = "删除菜单")
     public Result removeMenu(@RequestParam Long id) {
