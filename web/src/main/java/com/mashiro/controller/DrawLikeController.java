@@ -1,5 +1,7 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import com.mashiro.exception.DrawException;
 import com.mashiro.result.Result;
@@ -19,12 +21,10 @@ public class DrawLikeController {
     @Resource
     private DrawLikeService drawLikeService;
 
-
     /**
      * 点赞/取消点赞
-     * @param drawId
-     * @return
      */
+    @SaCheckPermission("like:operate")
     @Operation(summary = "点赞/取消点赞")
     @PostMapping("/{drawId}/like-toggle")
     public Result<?> toggleLike(@PathVariable("drawId") Long drawId) {
@@ -45,17 +45,14 @@ public class DrawLikeController {
         }
     }
 
-
     /**
      * 获取点赞数
-     * @param drawId
-     * @return
      */
+    @SaCheckPermission("gallery:view")
     @Operation(summary = "获取点赞数")
     @GetMapping("/count")
     public Result<?> getLikeCount(@RequestParam("drawId") Long drawId) {
         long likeCount = drawLikeService.getLikeCount(drawId);
         return Result.ok(likeCount);
     }
-
 }
