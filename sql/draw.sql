@@ -126,8 +126,8 @@ VALUES (1, 1, 1, '2024-10-31 13:40:49', '2024-10-31 13:40:49', 0),
        (6, 6, 2, '2024-10-31 13:40:49', '2024-10-31 13:40:49', 0),
        (7, 7, 2, '2024-10-31 13:40:49', '2024-10-31 13:40:49', 0);
 
+-- sys_role_menu
 DROP TABLE IF EXISTS `sys_role_menu`;
-
 CREATE TABLE `sys_role_menu`
 (
     `id`          int NOT NULL AUTO_INCREMENT COMMENT '关联ID',
@@ -172,7 +172,126 @@ VALUES (16, 3, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
        (20, 3, 8, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
        (21, 3, 9, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0);
 
+-- 系统管理权限
+INSERT INTO `sys_menu`
+VALUES
+-- 用户管理权限
+(20, '用户查看', '/user/view', 'User', 20, 'sysUser:view', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(21, '用户添加', '/user/add', 'User', 21, 'sysUser:add', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(22, '用户编辑', '/user/edit', 'User', 22, 'sysUser:edit', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(23, '用户删除', '/user/delete', 'User', 23, 'sysUser:delete', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
 
+-- 角色管理权限
+(24, '角色查看', '/role/view', 'User', 24, 'sysRole:view', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(25, '角色添加', '/role/add', 'User', 25, 'sysRole:add', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(26, '角色编辑', '/role/edit', 'User', 26, 'sysRole:edit', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(27, '角色删除', '/role/delete', 'User', 27, 'sysRole:delete', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+
+-- 菜单管理权限
+(28, '菜单查看', '/menu/view', 'Menu', 28, 'sysMenu:view', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(29, '菜单添加', '/menu/add', 'Menu', 29, 'sysMenu:add', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(30, '菜单编辑', '/menu/edit', 'Menu', 30, 'sysMenu:edit', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+(31, '菜单删除', '/menu/delete', 'Menu', 31, 'sysMenu:delete', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0),
+
+-- 绘画功能权限
+(32, '创艺馆查看', '/gallery/view', 'Gallery', 32, 'gallery:view', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00',
+ 0),
+(33, '创艺馆删除', '/gallery/delete', 'Gallery', 33, 'gallery:delete', 1, 1, '2024-11-26 10:00:00',
+ '2024-11-26 10:00:00', 0),
+
+-- 基础绘图权限
+(34, '文生图基础', '/text2img/basic', 'Text', 34, 'text2img:basic', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00',
+ 0),
+(35, '图生图基础', '/img2img/basic', 'Image', 35, 'img2img:basic', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00',
+ 0),
+
+-- 高级绘图权限
+(36, '超级文生图', '/text2img/advanced', 'Text', 36, 'text2img:advanced', 1, 1, '2024-11-26 10:00:00',
+ '2024-11-26 10:00:00', 0),
+(37, '超级图生图', '/img2img/advanced', 'Image', 37, 'img2img:advanced', 1, 1, '2024-11-26 10:00:00',
+ '2024-11-26 10:00:00', 0),
+
+-- 社交功能权限
+(38, '评论创建', '/comment/create', 'Comment', 38, 'comment:create', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00',
+ 0),
+(39, '评论删除', '/comment/delete', 'Comment', 39, 'comment:delete', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00',
+ 0),
+(40, '点赞操作', '/like/operate', 'Like', 40, 'like:operate', 1, 1, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0);
+
+-- 为管理员分配所有权限
+INSERT INTO `sys_role_menu`
+VALUES
+-- 用户管理权限
+(100, 1, 20, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 用户查看
+(101, 1, 21, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 用户添加
+(102, 1, 22, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 用户编辑
+(103, 1, 23, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 用户删除
+
+-- 角色管理权限
+(110, 1, 24, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 角色查看
+(111, 1, 25, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 角色添加
+(112, 1, 26, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 角色编辑
+(113, 1, 27, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 角色删除
+
+-- 菜单管理权限
+(120, 1, 28, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 菜单查看
+(121, 1, 29, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 菜单添加
+(122, 1, 30, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 菜单编辑
+(123, 1, 31, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 菜单删除
+
+-- 绘画功能权限
+(130, 1, 32, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 创艺馆查看
+(131, 1, 33, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 创艺馆删除
+
+-- 基础绘图权限
+(140, 1, 34, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 文生图基础
+(141, 1, 35, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 图生图基础
+
+-- 高级绘图权限
+(150, 1, 36, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 超级文生图
+(151, 1, 37, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 超级图生图
+
+-- 社交功能权限
+(160, 1, 38, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 评论创建
+(161, 1, 39, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 评论删除
+(162, 1, 40, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0);
+-- 点赞操作
+
+-- 为普通用户分配基础权限
+INSERT INTO `sys_role_menu`
+VALUES
+-- 基础功能权限
+(200, 2, 32, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 创艺馆查看
+(201, 2, 34, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 文生图基础
+(202, 2, 35, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 图生图基础
+
+-- 高级功能权限
+(210, 2, 36, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 超级文生图
+(211, 2, 37, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 超级图生图
+
+-- 社交功能权限
+(220, 2, 38, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 评论创建
+(221, 2, 40, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0);
+-- 点赞操作
+
+-- 为会员用户分配高级权限
+INSERT INTO `sys_role_menu`
+VALUES
+-- 基础功能权限
+(300, 3, 32, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 创艺馆查看
+(301, 3, 34, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 文生图基础
+(302, 3, 35, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 图生图基础
+
+-- 高级功能权限
+(310, 3, 36, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 超级文生图
+(311, 3, 37, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 超级图生图
+
+-- 社交功能权限
+(320, 3, 38, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0), -- 评论创建
+(321, 3, 40, '2024-11-26 10:00:00', '2024-11-26 10:00:00', 0);
+-- 点赞操作
+
+-- 绘画记录表
 DROP TABLE IF EXISTS `draw_record`;
 CREATE TABLE `draw_record`
 (
@@ -295,7 +414,7 @@ VALUES (1, 1, '1723799430',
         'http://106.55.168.194:9000/draw/user/1/2b949f6f-6a4b-4419-a492-26882db52824-image_from_url.png', 'IMG2IMG',
         '3', 0, 1, '2024-11-22 17:14:13', '2024-11-22 17:14:13', 0),
        (23, 1, '1723799430',
-        '1女孩，超广角镜头，伸手，缩短，在东京街头，现实主义，高分辨率，女性焦点，单人，雪天，围巾，帽子，飞雪，鱼眼镜头，鱼眼角度',
+        '1女孩，超广角镜头，伸手，缩短，��东京街头，��实主义，高分辨率，女��焦点，单人��雪天，围巾，帽子，飞雪，鱼���镜头，鱼眼���度',
         'badhandv4, EasyNegative, verybadimagenegative_v1.3,illustration, 3d, sepia, painting, cartoons, sketch, (worst quality:1.74), (low quality:1.74), (normal quality:1.44), lowres, bad anatomy, normal quality, ((monochrome)), ((grayscale)), ((letters)), ((english)), capital.',
         'http://106.55.168.194:9000/draw/user/1/e81cf514-7ea9-4ffe-a79e-e1b81870b823-image_from_url.png', 'TEXT2IMG',
         '2', 0, 1, '2024-11-22 18:37:59', '2024-11-22 18:37:58', 0),
@@ -400,6 +519,8 @@ VALUES (1, 1, '1723799430',
         'http://106.55.168.194:9000/draw/user/7/e75b5a68-ed4d-4e73-9aea-41d83ccf9ca9-image_from_url.png', 'IMG2IMG',
         '3', 0, 1, '2024-11-25 23:02:44', '2024-11-25 23:02:44', 0);
 
+
+-- 1. 绘画点赞表
 DROP TABLE IF EXISTS `draw_like`;
 
 CREATE TABLE `draw_like`
@@ -456,35 +577,43 @@ VALUES (1, 1, 1, '2024-11-19 22:36:52', '2024-11-25 21:20:55', 0),
        (33, 30, 7, '2024-11-25 22:57:50', '2024-11-25 22:57:50', 0);
 
 -- 绘画评论表
-CREATE TABLE `draw_comment` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '评论ID',
-    `draw_id` bigint NOT NULL COMMENT '绘画记录ID',
-    `user_id` int NOT NULL COMMENT '评论用户ID',
-    `content` text NOT NULL COMMENT '评论内容',
-    `parent_id` bigint DEFAULT NULL COMMENT '父评论ID，用于回复功能',
-    `reply_user_id` int DEFAULT NULL COMMENT '被回复的用户ID',
-    `like_count` int DEFAULT '0' COMMENT '点赞数',
-    `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `is_deleted` tinyint DEFAULT '0' COMMENT '是否删除：0未删除，1已删除',
+DROP TABLE IF EXISTS `draw_comment`;
+CREATE TABLE `draw_comment`
+(
+    `id`            bigint NOT NULL AUTO_INCREMENT COMMENT '评论ID',
+    `draw_id`       bigint NOT NULL COMMENT '绘画记录ID',
+    `user_id`       int    NOT NULL COMMENT '评论用户ID',
+    `content`       text   NOT NULL COMMENT '评论内容',
+    `parent_id`     bigint   DEFAULT NULL COMMENT '父评论ID，用于回复功能',
+    `reply_user_id` int      DEFAULT NULL COMMENT '被回复的用户ID',
+    `like_count`    int      DEFAULT '0' COMMENT '点赞数',
+    `create_time`   datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`   datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    `is_deleted`    tinyint  DEFAULT '0' COMMENT '是否删除：0未删除，1已删除',
     PRIMARY KEY (`id`),
     KEY `idx_draw_id` (`draw_id`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_parent_id` (`parent_id`),
     KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='绘画评论表';
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='绘画评论表';
 
 -- 评论点赞表
-CREATE TABLE `comment_like` (
-    `id` bigint NOT NULL AUTO_INCREMENT COMMENT '点赞ID',
-    `comment_id` bigint NOT NULL COMMENT '评论ID',
-    `user_id` int NOT NULL COMMENT '用户ID',
+DROP TABLE IF EXISTS `comment_like`;
+CREATE TABLE `comment_like`
+(
+    `id`          bigint NOT NULL AUTO_INCREMENT COMMENT '点赞ID',
+    `comment_id`  bigint NOT NULL COMMENT '评论ID',
+    `user_id`     int    NOT NULL COMMENT '用户ID',
     `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    `is_deleted` tinyint DEFAULT '0' COMMENT '是否删除：0未删除，1已删除',
+    `is_deleted`  tinyint  DEFAULT '0' COMMENT '是否删除：0未删除，1已删除',
     PRIMARY KEY (`id`),
     UNIQUE KEY `unique_user_comment` (`user_id`, `comment_id`),
     KEY `idx_comment_id` (`comment_id`),
     KEY `idx_user_id` (`user_id`),
     KEY `idx_create_time` (`create_time`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='评论点赞表';
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8mb4
+  COLLATE = utf8mb4_unicode_ci COMMENT ='评论点赞表';
