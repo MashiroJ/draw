@@ -1,6 +1,7 @@
 package com.mashiro.controller;
 
-
+import cn.dev33.satoken.annotation.SaCheckLogin;
+import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.mashiro.dto.CommentDto;
 import com.mashiro.entity.DrawComment;
@@ -21,6 +22,10 @@ public class CommentController {
     @Resource
     private CommentService commentService;
 
+    /**
+     * 添加评论
+     */
+    @SaCheckPermission("comment:create")
     @Operation(summary = "添加评论")
     @PostMapping("/add")
     public Result addComment(@RequestBody CommentDto commentDto) {
@@ -28,6 +33,10 @@ public class CommentController {
         return Result.ok();
     }
 
+    /**
+     * 删除评论
+     */
+    @SaCheckPermission("comment:delete")
     @Operation(summary = "删除评论")
     @DeleteMapping("/{commentId}")
     public Result deleteComment(@PathVariable Long commentId) {
@@ -36,6 +45,10 @@ public class CommentController {
         return Result.ok();
     }
 
+    /**
+     * 点赞评论
+     */
+    @SaCheckPermission("like:operate")
     @Operation(summary = "点赞评论")
     @PostMapping("/like/{commentId}")
     public Result likeComment(@PathVariable Long commentId) {
@@ -43,6 +56,10 @@ public class CommentController {
         return Result.ok();
     }
 
+    /**
+     * 取消点赞
+     */
+    @SaCheckPermission("like:operate")
     @Operation(summary = "取消点赞")
     @DeleteMapping("/unlike/{commentId}")
     public Result unlikeComment(@PathVariable Long commentId) {
@@ -50,6 +67,10 @@ public class CommentController {
         return Result.ok();
     }
 
+    /**
+     * 分页获取评论列表
+     */
+    @SaCheckPermission("gallery:view")
     @Operation(summary = "分页获取评论列表")
     @GetMapping("/page/{drawId}")
     public Result<Page<DrawComment>> getCommentPage(
