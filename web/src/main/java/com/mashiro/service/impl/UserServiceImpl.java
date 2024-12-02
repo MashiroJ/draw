@@ -106,11 +106,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
                 allRoleMenuIds.addAll(MenuIds);
             } else if (roleId == 2) {
                 List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
-                List<Long> MenuIds = roleMenuIds.stream().limit(6).toList();
+                List<Long> MenuIds = roleMenuIds.stream().limit(4).toList();
                 allRoleMenuIds.addAll(MenuIds);
             } else if (roleId == 3) {
                 List<Long> roleMenuIds = roleMenuMapper.findSysRoleMenuByRoleId(roleId);
-                List<Long> MenuIds = roleMenuIds.stream().limit(4).toList();
+                List<Long> MenuIds = roleMenuIds.stream().limit(6).toList();
                 allRoleMenuIds.addAll(MenuIds);
             }
         }

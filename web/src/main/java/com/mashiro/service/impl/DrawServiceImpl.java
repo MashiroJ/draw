@@ -8,14 +8,14 @@ import com.comfyui.queue.common.IDrawingTaskSubmit;
 import com.mashiro.dto.DrawDto;
 import com.mashiro.entity.DrawRecord;
 import com.mashiro.enums.BaseFlowWork;
+import com.mashiro.enums.ComfyUi.Checkpoint;
+import com.mashiro.enums.ComfyUi.ImageSize;
 import com.mashiro.exception.DrawException;
 import com.mashiro.mapper.DrawRecordMapper;
 import com.mashiro.result.Result;
 import com.mashiro.result.ResultCodeEnum;
 import com.mashiro.service.DrawService;
 import com.mashiro.service.FileService;
-import com.mashiro.service.PointsService;
-import com.mashiro.service.UserService;
 import com.mashiro.utils.ComfyUi.ComfyUiProperties;
 import com.mashiro.utils.TaskProcessMonitor.TaskProcessMonitor;
 import jakarta.annotation.Resource;
@@ -108,10 +108,12 @@ public class DrawServiceImpl implements DrawService {
      * 文生图接口
      *
      * @param drawDto
+     * @param checkpoint
+     * @param imageSize
      * @return
      */
     @Override
-    public String text2img(DrawDto drawDto) {
+    public String text2img(DrawDto drawDto, Checkpoint checkpoint, ImageSize imageSize) {
         // 参数校验
         validateDrawRequest(drawDto);
         // 提示词
@@ -126,7 +128,7 @@ public class DrawServiceImpl implements DrawService {
             // 准备工作流
             BaseFlowWork baseFlowWork = BaseFlowWork.TEXT2IMG;
             // 获取工作流, 并替换工作流里面的默认提示词
-            ComfyWorkFlow flow = prepareWorkFlow(baseFlowWork, prompt);
+            ComfyWorkFlow flow = prepareWorkFlow(baseFlowWork, prompt, checkpoint, imageSize);
             // 获取反向提示词
             String negativePrompt = getNegativePrompt(flow);
             // 提交任务
@@ -151,10 +153,11 @@ public class DrawServiceImpl implements DrawService {
      *
      * @param drawDto
      * @param uploadImage
+     * @param checkpoint
      * @return
      */
     @Override
-    public String img2img(DrawDto drawDto, MultipartFile uploadImage) {
+    public String img2img(DrawDto drawDto, MultipartFile uploadImage, Checkpoint checkpoint) {
         // 参数校验
         validateImg2ImgRequest(drawDto, uploadImage);
         // 提示词
@@ -171,7 +174,7 @@ public class DrawServiceImpl implements DrawService {
             // 准备工作流
             BaseFlowWork baseFlowWork = BaseFlowWork.IMG2IMG;
             // 获取工作流, 并替换工作流里面的默认提示词和默认文件
-            ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath, prompt);
+            ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath, prompt, checkpoint);
             // 获取反向提示词
             String negativePrompt = getNegativePrompt(flow);
             // 提交任务
@@ -234,14 +237,33 @@ public class DrawServiceImpl implements DrawService {
      *
      * @param baseFlowWork
      * @param prompt
+     * @param checkpoint
+     * @param imageSize
      * @return
      */
-    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork, String prompt) {
+    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork, String prompt, Checkpoint checkpoint, ImageSize imageSize) {
         // 获取工作流
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
+
+        // 替换工作流里面的模型
+        ComfyWorkFlowNode checkpointNode = flow.getNode("4");
+        if (checkpointNode != null) {
+            checkpointNode.getInputs().put("ckpt_name", checkpoint.getName());
+        } else {
+            log.warn("工作流中未找到checkpointNode的节点");
+        }
+
+        ComfyWorkFlowNode imageNode = flow.getNode("5");
+        if (imageNode != null) {
+            imageNode.getInputs().put("width", imageSize.getWidth());
+            imageNode.getInputs().put("height", imageSize.getHeight());
+        } else {
+            log.warn("工作流中未找到checkpointNode的节点");
+        }
+
         // 替换工作流里面的默认提示词
         ComfyWorkFlowNode promptNode = flow.getNode("10");
         if (promptNode != null) {
@@ -262,13 +284,21 @@ public class DrawServiceImpl implements DrawService {
      * @param baseFlowWork
      * @param uploadedImagePath
      * @param prompt
+     * @param checkpoint
      * @return
      */
-    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork, String uploadedImagePath, String prompt) {
+    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork, String uploadedImagePath, String prompt, Checkpoint checkpoint) {
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
         log.info("获取图生图工作流: {}", flow);
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
+        // 替换工作流里面的模型
+        ComfyWorkFlowNode checkpointNode = flow.getNode("4");
+        if (checkpointNode != null) {
+            checkpointNode.getInputs().put("ckpt_name", checkpoint.getName());
+        } else {
+            log.warn("工作流中未找到checkpointNode的节点");
         }
 
         // 更新工作流中的图片加载节点

@@ -7,6 +7,8 @@ import com.comfyui.common.entity.ComfyWorkFlow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mashiro.dto.DrawDto;
+import com.mashiro.enums.ComfyUi.Checkpoint;
+import com.mashiro.enums.ComfyUi.ImageSize;
 import com.mashiro.result.Result;
 import com.mashiro.service.DrawService;
 import com.mashiro.service.PointsService;
@@ -53,9 +55,13 @@ public class DrawController {
     @SaCheckPermission("text2img:basic")
     @Operation(summary = "文生图")
     @PostMapping("text2img")
-    public Result<String> text2img(@RequestBody DrawDto drawDto) {
+    public Result<String> text2img(@RequestBody DrawDto drawDto,
+                                   @RequestParam("checkpoint") Integer checkpointCode,
+                                   @RequestParam("imageSize") Integer imageSizeCode) {
+        Checkpoint checkpoint = Checkpoint.fromCode(checkpointCode);
+        ImageSize imageSize = ImageSize.fromCode(imageSizeCode);
         long loginUserId = StpUtil.getLoginIdAsLong();
-        String text2imgUrl = drawService.text2img(drawDto);
+        String text2imgUrl = drawService.text2img(drawDto,checkpoint,imageSize);
         // 文生图图片创作成功，扣除积分
         pointsService.deductPoints(loginUserId, TEXT2IMG_POINT);
         return Result.ok(text2imgUrl);
@@ -69,13 +75,15 @@ public class DrawController {
     @PostMapping("img2img")
     public Result<String> img2img(
             @RequestPart("drawDto") String drawDtoJson,
+            @RequestParam("checkpoint") Integer checkpointCode,
             @RequestPart(value = "uploadImage", required = false) MultipartFile uploadImage
     ) {
+        Checkpoint checkpoint = Checkpoint.fromCode(checkpointCode);
         long loginUserId = StpUtil.getLoginIdAsLong();
         try {
             ObjectMapper mapper = new ObjectMapper();
             DrawDto drawDto = mapper.readValue(drawDtoJson, DrawDto.class);
-            String img2imgUrl = drawService.img2img(drawDto, uploadImage);
+            String img2imgUrl = drawService.img2img(drawDto, uploadImage,checkpoint);
             // 图生图图片创作成功，扣除积分
             pointsService.deductPoints(loginUserId, IMG2IMG_POINT);
             return Result.ok(img2imgUrl);
