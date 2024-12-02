@@ -1,5 +1,6 @@
 package com.mashiro.controller;
 
+import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.mashiro.entity.Role;
@@ -90,7 +91,7 @@ public class RoleController {
     /**
      * 查询当前角色所拥有的菜单
      */
-    @SaCheckPermission("sysRole:view")
+    @SaCheckLogin
     @Operation(summary = "查询当前角色所拥有的菜单")
     @GetMapping("getMenuIdsByRoleId")
     public Result<Map<String, Object>> getMenuIdsByRoleId(@RequestParam Long roleId) {
