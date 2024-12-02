@@ -274,7 +274,7 @@ public class UserController {
      * @param userId 用户ID
      * @return 用户拥有的角色信息
      */
-    @SaCheckPermission("sysRole:view")
+    @SaCheckLogin
     @Operation(summary = "查询用户拥有的角色")
     @GetMapping("/getRoleIdsByUserId")
     public Result getRoleIdsByUserId(@RequestParam Long userId) {
