@@ -68,7 +68,7 @@
   },
   "7": {
     "inputs": {
-      "text": "badhandv4, EasyNegative, verybadimagenegative_v1.3,illustration, 3d, sepia, painting, cartoons, sketch, (worst quality:1.74), (low quality:1.74), (normal quality:1.44), lowres, bad anatomy, normal quality, ((monochrome)), ((grayscale)), ((letters)), ((english)), capital.",
+      "text": "(worst quality:2),(low quality:2),(normal quality:2),lowres,watermark,",
       "speak_and_recognation": true,
       "clip": [
         "4",
