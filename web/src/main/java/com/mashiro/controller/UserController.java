@@ -171,7 +171,7 @@ public class UserController {
      * @param user
      * @return
      */
-    @SaCheckPermission("sysUser:edit")
+    @SaCheckLogin
     @Operation(summary = "更新用户信息")
     @PatchMapping("/updateUser")
     @Transactional
