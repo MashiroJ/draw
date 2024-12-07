@@ -1,6 +1,5 @@
 package com.mashiro.controller;
 
-import cn.dev33.satoken.annotation.SaCheckLogin;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import cn.dev33.satoken.stp.StpUtil;
 import com.mashiro.dto.SuperDrawDto;
@@ -18,8 +17,8 @@ import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.mashiro.constant.DrawPointConstant.SUPER_IMG2IMG_POINT;
-import static com.mashiro.constant.DrawPointConstant.SUPER_TEXT2IMG_POINT;
+import static com.mashiro.constant.DrawPointConstant.SUPER_DRAW_POINT;
+
 
 @Tag(name = "超级绘画", description = "AI绘画")
 @RestController
@@ -46,7 +45,7 @@ public class SuperDrawController {
         String result = service.superText2img(request.getDrawDto(), imageSize, checkpoint, sampler, scheduler);
         // 文生图图片创作成功，扣除积分
         long loginUserId = StpUtil.getLoginIdAsLong();
-        pointsService.deductPoints(loginUserId, SUPER_TEXT2IMG_POINT);
+        pointsService.deductPoints(loginUserId, SUPER_DRAW_POINT);
         return Result.ok(result);
     }
 
@@ -73,7 +72,7 @@ public class SuperDrawController {
         String result = service.superImg2img(drawDto, imageSize, checkpoint, sampler, scheduler, uploadImage);
         // 文生图图片创作成功，扣除积分
         long loginUserId = StpUtil.getLoginIdAsLong();
-        pointsService.deductPoints(loginUserId, SUPER_IMG2IMG_POINT);
+        pointsService.deductPoints(loginUserId, SUPER_DRAW_POINT);
         return Result.ok(result);
     }
 }

@@ -3,6 +3,11 @@ server:
 spring:
   profiles:
     active: dev   #启用开发环境
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+      enabled: true
   jackson:
     date-format: yyyy-MM-dd
   #  comfyui

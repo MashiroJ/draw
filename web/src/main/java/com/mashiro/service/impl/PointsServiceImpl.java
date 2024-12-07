@@ -1,7 +1,9 @@
 package com.mashiro.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.fasterxml.jackson.databind.ser.Serializers;
 import com.mashiro.entity.User;
+import com.mashiro.enums.BaseRole;
 import com.mashiro.exception.DrawException;
 import com.mashiro.result.Result;
 import com.mashiro.result.ResultCodeEnum;
@@ -11,6 +13,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
@@ -81,16 +84,43 @@ public class PointsServiceImpl implements PointsService {
             throw new DrawException(ResultCodeEnum.USER_NOT_FOUND);
         }
 
-        // 管理员角色积分为无限，不能扣除
-        if (user.getPoints() == null) {
-            return Result.error("管理员角色积分为无限，无法扣除");
+        List<Long> roleIdsByUserId = userService.getRoleIdsByUserId(userId);
+        log.info("用户角色列表：{}", roleIdsByUserId);
+        //通过用户ID获取用户相关联的角色ID：[3]
+        // 管理员无需扣除积分
+        if (roleIdsByUserId.contains((long)BaseRole.ADMIN.getCode())) {
+            return Result.error("管理员无需扣除积分");
         }
 
-        // 校验扣除积分是否足够
-        int currentPoints = user.getPoints();
+        // 会员用户享受 0.5 折扣，即扣除积分减半
+        if (roleIdsByUserId.contains((long)BaseRole.MUSER.getCode())) {
+            if (points <= 0) {
+                return Result.error("扣除积分必须为正数");
+            }
+            int actualDeductPoints = points / 2;
+            if (actualDeductPoints <= 0) {
+                return Result.error("扣除积分过低，无法扣除");
+            }
+            int currentPoints = user.getPoints();
+            if (currentPoints < actualDeductPoints) {
+                return Result.error("积分不足，无法扣除！");
+            }
+
+            // 更新用户积分
+            int updatedPoints = currentPoints - actualDeductPoints;
+            LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+            updateWrapper.eq(User::getId, userId)
+                    .set(User::getPoints, updatedPoints);
+            userService.update(updateWrapper);
+
+            return Result.ok("扣除成功，实际扣除 " + actualDeductPoints + " 积分，剩余积分：" + updatedPoints);
+        }
+
+        // 普通用户正常扣除积分
         if (points <= 0) {
             return Result.error("扣除积分必须为正数");
         }
+        int currentPoints = user.getPoints();
         if (currentPoints < points) {
             return Result.error("积分不足，无法扣除！");
         }

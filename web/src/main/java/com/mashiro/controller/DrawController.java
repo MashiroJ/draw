@@ -19,8 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import static com.mashiro.constant.DrawPointConstant.IMG2IMG_POINT;
-import static com.mashiro.constant.DrawPointConstant.TEXT2IMG_POINT;
+import static com.mashiro.constant.DrawPointConstant.DRAW_POINT;
 
 @Tag(name = "绘图相关接口")
 @Slf4j
@@ -63,7 +62,7 @@ public class DrawController {
         long loginUserId = StpUtil.getLoginIdAsLong();
         String text2imgUrl = drawService.text2img(drawDto,checkpoint,imageSize);
         // 文生图图片创作成功，扣除积分
-        pointsService.deductPoints(loginUserId, TEXT2IMG_POINT);
+        pointsService.deductPoints(loginUserId, DRAW_POINT);
         return Result.ok(text2imgUrl);
     }
 
@@ -85,7 +84,7 @@ public class DrawController {
             DrawDto drawDto = mapper.readValue(drawDtoJson, DrawDto.class);
             String img2imgUrl = drawService.img2img(drawDto, uploadImage,checkpoint);
             // 图生图图片创作成功，扣除积分
-            pointsService.deductPoints(loginUserId, IMG2IMG_POINT);
+            pointsService.deductPoints(loginUserId, DRAW_POINT);
             return Result.ok(img2imgUrl);
         } catch (JsonProcessingException e) {
             return Result.error("参数解析失败：" + e.getMessage());
