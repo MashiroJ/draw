@@ -116,7 +116,7 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
     }
 
     /**
-     * 获取任务输出文件名
+     * 获取任务输出���件名
      *
      * @param taskId 任务ID
      * @return 文件名
@@ -145,5 +145,15 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
             }
         }
         return false; // 超时返回false
+    }
+
+    /**
+     * 清除任务状态
+     *
+     * @param taskId 任务ID
+     */
+    public void clearTaskStatus(String taskId) {
+        taskStatusMap.remove(taskId);
+        taskOutputMap.remove(taskId);
     }
 }
