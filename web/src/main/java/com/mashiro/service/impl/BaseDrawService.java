@@ -77,7 +77,18 @@ public abstract class BaseDrawService {
     protected void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
         DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
         taskSubmit.submit(drawingTaskInfo);
-        Thread.sleep(TASK_WAIT_TIME);
+        
+        // 使用TaskProcessMonitor监控任务完成状态
+        boolean completed = taskProcessMonitor.waitForCompletion(taskId, TASK_TIMEOUT, TimeUnit.MINUTES);
+        if (!completed) {
+            throw new DrawException(ResultCodeEnum.TASK_TIMEOUT);
+        }
+        
+        // 检查任务状态
+        TaskProcessMonitor.TaskStatus status = taskProcessMonitor.getTaskStatus(taskId);
+        if (status == TaskProcessMonitor.TaskStatus.ERROR) {
+            throw new DrawException(ResultCodeEnum.TASK_FAILED);
+        }
     }
 
     protected String processTaskResult(String taskId) {
