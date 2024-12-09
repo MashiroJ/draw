@@ -75,6 +75,9 @@ public abstract class BaseDrawService {
     }
 
     protected void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
+        // 在提交新任务前，清理之前的任务状态
+        taskProcessMonitor.clearTaskStatus(taskId);
+        
         DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
         taskSubmit.submit(drawingTaskInfo);
         
@@ -102,6 +105,9 @@ public abstract class BaseDrawService {
         if (!StringUtils.hasText(url)) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
+        
+        // 处理完结果后清理任务状态
+        taskProcessMonitor.clearTaskStatus(taskId);
         return url;
     }
 
