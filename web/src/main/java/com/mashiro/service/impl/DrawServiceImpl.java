@@ -383,7 +383,13 @@ public class DrawServiceImpl implements DrawService {
     private void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
         DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
         taskSubmit.submit(drawingTaskInfo);
-        Thread.sleep(TASK_WAIT_TIME);
+        
+        // 等待任务完成或超时
+        boolean completed = taskProcessMonitor.waitForCompletion(taskId, TASK_TIMEOUT, TimeUnit.MINUTES);
+        if (!completed) {
+            log.error("任务执行超时或失败, taskId: {}", taskId);
+            throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
+        }
     }
 
     /**

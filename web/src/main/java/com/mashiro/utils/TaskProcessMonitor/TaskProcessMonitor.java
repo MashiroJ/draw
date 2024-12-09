@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -14,6 +15,16 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
 
     // 用于存储任务ID和输出文件名的映射关系
     private final Map<String, String> taskOutputMap = new ConcurrentHashMap<>();
+    // 添加任务状态映射
+    private final Map<String, TaskStatus> taskStatusMap = new ConcurrentHashMap<>();
+    
+    // 添加任务状态枚举
+    public enum TaskStatus {
+        PENDING,    // 等待中
+        RUNNING,    // 运行中
+        COMPLETED,  // 已完成
+        ERROR      // 错误
+    }
 
     /**
      * 任务开始
@@ -23,6 +34,7 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
     @Override
     public void taskStart(ComfyTaskStart start) {
         log.info("任务开始, 任务id:{},ComfyUi任务ID：{}", start.getTaskId(), start.getComfyTaskId());
+        taskStatusMap.put(start.getTaskId(), TaskStatus.RUNNING);
     }
 
     /**
@@ -71,6 +83,7 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
             String outputFileName = complete.getImages().get(0).getFileName();
             taskOutputMap.put(complete.getTaskId(), outputFileName);
         }
+        taskStatusMap.put(complete.getTaskId(), TaskStatus.COMPLETED);
     }
 
     /**
@@ -81,6 +94,7 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
     @Override
     public void taskError(ComfyTaskError error) {
         log.error("任务错误， 任务id:{}, 内部任务id: {}, 错误信息: {}", error.getTaskId(), error.getComfyTaskId(), error.getErrorInfo());
+        taskStatusMap.put(error.getTaskId(), TaskStatus.ERROR);
     }
 
     /**
@@ -109,5 +123,27 @@ public class TaskProcessMonitor implements ITaskProcessReceiver {
      */
     public String getTaskOutputFileName(String taskId) {
         return taskOutputMap.get(taskId);
+    }
+
+    // 添加获取任务状态的方法
+    public TaskStatus getTaskStatus(String taskId) {
+        return taskStatusMap.getOrDefault(taskId, TaskStatus.PENDING);
+    }
+
+    // 添加等待任务完成的方法
+    public boolean waitForCompletion(String taskId, long timeout, TimeUnit unit) throws InterruptedException {
+        long endTime = System.currentTimeMillis() + unit.toMillis(timeout);
+        while (System.currentTimeMillis() < endTime) {
+            TaskStatus status = getTaskStatus(taskId);
+            switch (status) {
+                case COMPLETED:
+                    return true;
+                case ERROR:
+                    return false;
+                default:
+                    Thread.sleep(1000); // 每秒检查一次状态
+            }
+        }
+        return false; // 超时返回false
     }
 }
