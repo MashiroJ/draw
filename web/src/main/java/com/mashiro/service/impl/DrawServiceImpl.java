@@ -18,6 +18,8 @@ import com.mashiro.service.DrawService;
 import com.mashiro.service.FileService;
 import com.mashiro.utils.ComfyUi.ComfyUiProperties;
 import com.mashiro.utils.TaskProcessMonitor.TaskProcessMonitor;
+import com.mashiro.config.comfyUi.WorkflowNodeConfig;
+import com.mashiro.service.impl.BaseDrawService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
@@ -38,11 +40,11 @@ import static com.mashiro.constant.UserConstant.DEFAULT_TASK_ID;
 
 @Slf4j
 @Service
-public class DrawServiceImpl implements DrawService {
+public class DrawServiceImpl extends BaseDrawService implements DrawService {
 
     private static final int TASK_WAIT_TIME = 20000; // 20秒
     private static final int TASK_TIMEOUT = 5; // 5分钟
-    final String QUALITY_PREFIX = "杰作,质量最好的,";
+    private static final String QUALITY_PREFIX = "杰作,质量最好的,";
 
 
     @Resource
@@ -130,7 +132,8 @@ public class DrawServiceImpl implements DrawService {
             // 获取工作流, 并替换工作流里面的默认提示词
             ComfyWorkFlow flow = prepareWorkFlow(baseFlowWork, prompt, checkpoint, imageSize);
             // 获取反向提示词
-            String negativePrompt = getNegativePrompt(flow);
+            WorkflowNodeConfig nodeConfig = WorkflowNodeConfig.text2ImgConfig();
+            String negativePrompt = getNegativePrompt(flow, nodeConfig);
             // 提交任务
             submitDrawingTask(flow, taskId);
             // 根据taskId获取图像Url处理任务结果
@@ -173,10 +176,11 @@ public class DrawServiceImpl implements DrawService {
             String uploadedImagePath = handleUploadedImage(uploadImage, taskId);
             // 准备工作流
             BaseFlowWork baseFlowWork = BaseFlowWork.IMG2IMG;
-            // 获取工作流, 并替换工作流里面的默认提示词和默认文件
+            // 获取工作流, 并替换工作流��面的默认提示词和默认文件
             ComfyWorkFlow flow = prepareImg2ImgWorkFlow(baseFlowWork, uploadedImagePath, prompt, checkpoint);
             // 获取反向提示词
-            String negativePrompt = getNegativePrompt(flow);
+            WorkflowNodeConfig nodeConfig = WorkflowNodeConfig.img2ImgConfig();
+            String negativePrompt = getNegativePrompt(flow, nodeConfig);
             // 提交任务
             submitDrawingTask(flow, taskId);
             // 根据taskId获取图像Url处理任务结果
@@ -225,7 +229,7 @@ public class DrawServiceImpl implements DrawService {
      *
      * @return
      */
-    private String generateTaskId() {
+    protected String generateTaskId() {
         if (StpUtil.getLoginId() == null) {
             throw new DrawException(ResultCodeEnum.APP_LOGIN_AUTH);
         }
@@ -234,101 +238,93 @@ public class DrawServiceImpl implements DrawService {
 
     /**
      * 预处理文生图工作流
-     *
-     * @param baseFlowWork
-     * @param prompt
-     * @param checkpoint
-     * @param imageSize
-     * @return
      */
-    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork, String prompt, Checkpoint checkpoint, ImageSize imageSize) {
-        // 获取工作流
+    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork, String prompt, 
+            Checkpoint checkpoint, ImageSize imageSize) {
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
 
+        WorkflowNodeConfig nodeConfig = WorkflowNodeConfig.text2ImgConfig();
+
         // 替换工作流里面的模型
-        ComfyWorkFlowNode checkpointNode = flow.getNode("4");
+        ComfyWorkFlowNode checkpointNode = flow.getNode(nodeConfig.getCheckPointId());
         if (checkpointNode != null) {
             checkpointNode.getInputs().put("ckpt_name", checkpoint.getName());
-        } else {
-            log.warn("工作流中未找到checkpointNode的节点");
         }
 
-        ComfyWorkFlowNode imageNode = flow.getNode("5");
+        ComfyWorkFlowNode imageNode = flow.getNode(nodeConfig.getImageNodeId());
         if (imageNode != null) {
             imageNode.getInputs().put("width", imageSize.getWidth());
             imageNode.getInputs().put("height", imageSize.getHeight());
-        } else {
-            log.warn("工作流中未找到checkpointNode的节点");
         }
 
         // 替换工作流里面的默认提示词
-        ComfyWorkFlowNode promptNode = flow.getNode("10");
+        ComfyWorkFlowNode promptNode = flow.getNode(nodeConfig.getPositiveId());
         if (promptNode != null) {
             promptNode.getInputs().put("text", prompt);
-        } else {
-            log.warn("工作流中未找到promptNode的节点");
         }
 
         // 配置随机种子
-        configureRandomSeed(flow);
+        configureRandomSeed(flow, nodeConfig);
+        
         log.info("获取修改后的文生图工作流: {}", flow);
         return flow;
     }
 
     /**
      * 预处理图生图工作流
-     *
-     * @param baseFlowWork
-     * @param uploadedImagePath
-     * @param prompt
-     * @param checkpoint
-     * @return
      */
-    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork, String uploadedImagePath, String prompt, Checkpoint checkpoint) {
+    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork, 
+            String uploadedImagePath, String prompt, Checkpoint checkpoint) {
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
-        log.info("获取图生图工作流: {}", flow);
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
         }
-        // 替换工作流里面的模型
-        ComfyWorkFlowNode checkpointNode = flow.getNode("4");
+
+        WorkflowNodeConfig nodeConfig = WorkflowNodeConfig.img2ImgConfig();
+
+        // 替换��作流里面的模型
+        ComfyWorkFlowNode checkpointNode = flow.getNode(nodeConfig.getCheckPointId());
         if (checkpointNode != null) {
             checkpointNode.getInputs().put("ckpt_name", checkpoint.getName());
-        } else {
-            log.warn("工作流中未找到checkpointNode的节点");
         }
 
         // 更新工作流中的图片加载节点
-        ComfyWorkFlowNode imageNode = flow.getNode("10");
+        ComfyWorkFlowNode imageNode = flow.getNode(nodeConfig.getInputImageId());
         if (imageNode != null) {
             imageNode.getInputs().put("image", uploadedImagePath);
-        } else {
-            log.warn("工作流中未找到imageNode的图片加载节点");
         }
 
         // 配置随机种子
-        configureRandomSeed(flow);
+        configureRandomSeed(flow, nodeConfig);
+        
         // 替换工作流里面的默认提示词
-        ComfyWorkFlowNode promptNode = flow.getNode(5);
-        promptNode.getInputs().put("text", prompt);
+        ComfyWorkFlowNode promptNode = flow.getNode(nodeConfig.getPositiveId());
+        if (promptNode != null) {
+            promptNode.getInputs().put("text", prompt);
+        }
+
         return flow;
     }
 
     /**
      * 配置随机种子
-     *
-     * @param flow
      */
-    private void configureRandomSeed(ComfyWorkFlow flow) {
-        ComfyWorkFlowNode seedNode = flow.getNode("3");
+    private void configureRandomSeed(ComfyWorkFlow flow, WorkflowNodeConfig nodeConfig) {
+        ComfyWorkFlowNode seedNode = flow.getNode(nodeConfig.getSeedNodeId());
         if (seedNode != null) {
             seedNode.getInputs().put("seed", Math.abs(new Random().nextInt()));
-        } else {
-            log.warn("工作流中seedNode的节点");
         }
+    }
+
+    /**
+     * 获取反向提示词
+     */
+    private String getNegativePrompt(ComfyWorkFlow flow, WorkflowNodeConfig nodeConfig) {
+        ComfyWorkFlowNode negativePromptNode = flow.getNode(nodeConfig.getNegativeId());
+        return (String) negativePromptNode.getInputs().get("text");
     }
 
     /**
@@ -338,7 +334,7 @@ public class DrawServiceImpl implements DrawService {
      * @param taskId
      * @return
      */
-    private String handleUploadedImage(MultipartFile uploadImage, String taskId) {
+    protected String handleUploadedImage(MultipartFile uploadImage, String taskId) {
         try {
             // 获取原始文件名
             String originalFilename = uploadImage.getOriginalFilename();
@@ -362,17 +358,6 @@ public class DrawServiceImpl implements DrawService {
     }
 
     /**
-     * 获取反向提示词
-     *
-     * @param flow
-     * @return
-     */
-    private static String getNegativePrompt(ComfyWorkFlow flow) {
-        ComfyWorkFlowNode negativePromptNode = flow.getNode("7");
-        return (String) negativePromptNode.getInputs().get("text");
-    }
-
-    /**
      * 获取negativePrompt信息，并提交任务
      *
      * @param flow
@@ -380,7 +365,7 @@ public class DrawServiceImpl implements DrawService {
      * @return
      * @throws InterruptedException
      */
-    private void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
+    protected void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
         // 清理可能存在的旧状态
         taskProcessMonitor.clearTaskStatus(taskId);
         
@@ -401,7 +386,7 @@ public class DrawServiceImpl implements DrawService {
      * @param taskId
      * @return
      */
-    private String processTaskResult(String taskId) {
+    protected String processTaskResult(String taskId) {
         String fileName = taskProcessMonitor.getTaskOutputFileName(taskId);
         if (!StringUtils.hasText(fileName)) {
             throw new DrawException(ResultCodeEnum.DATA_ERROR);
