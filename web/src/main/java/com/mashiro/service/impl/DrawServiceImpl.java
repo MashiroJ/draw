@@ -381,6 +381,9 @@ public class DrawServiceImpl implements DrawService {
      * @throws InterruptedException
      */
     private void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
+        // 清理可能存在的旧状态
+        taskProcessMonitor.clearTaskStatus(taskId);
+        
         DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
         taskSubmit.submit(drawingTaskInfo);
         
