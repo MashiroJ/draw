@@ -10,7 +10,9 @@ public enum Checkpoint implements BaseEnum {
     AOM3A1B(1, "AOM3A1B_orangemixs.safetensors"),
     COUNTERFEIT(2, "Counterfeit-V2.5_pruned.safetensors"),
     MAJICMIX_ALPHA(3,"majicMIX alpha 麦橘男团_v2.0.safetensors"),
-    MAJICMIX_REALISTIC(4, "majicMIX realistic 麦橘写实_v7.safetensors");
+    MAJICMIX_REALISTIC(4, "majicMIX realistic 麦橘写实_v7.safetensors"),
+    ANIMEKAWA(5,"AnimeKawa_v1.0.safetensors"),
+    ILLUSTRATION(6,"illustration 卡通插画_v1.0.safetensors");
 
 
     @EnumValue
