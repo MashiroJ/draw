@@ -22,8 +22,8 @@
         create_time,update_time,is_deleted
     </sql>
     <insert id="registerUser" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO sys_user (username, password, avatar_url, status)
-        VALUES (#{username}, #{password}, #{avatarUrl}, #{status})
+        INSERT INTO sys_user (username, password, avatar_url, status,points)
+        VALUES (#{username}, #{password}, #{avatarUrl}, #{status}, #{points})
     </insert>
     <insert id="addPoint">
             update sys_user

@@ -24,8 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.mashiro.constant.UserConstant.DEFAULT_MUSER_POINTS;
-import static com.mashiro.constant.UserConstant.DEFAULT_USER_POINTS;
+import static com.mashiro.constant.UserConstant.*;
 
 /**
  * @author mashiro
@@ -58,6 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setUsername(username);
         user.setPassword(sha256);
         user.setStatus(BaseStatus.ENABLE);
+        user.setPoints(DEFAULT_POINTS);
         userMapper.registerUser(user);
         return user;
     }
