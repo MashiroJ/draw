@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.mashiro</groupId>
     <artifactId>web</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>web</name>
-    <description>web</description>
+    <description>基于 Spring Boot 3 的 AI 绘图应用服务端，集成 ComfyUI 实现 AI 绘图功能，使用 Sa-Token 进行权限认证，支持 WebSocket 实时通信，整合 Redis 缓存，MyBatis-Plus 数据持久化，并提供验证码、API 文档等功能的综合性 Web 服务。</description>
 
     <!--继承父项目-->
     <parent>

@@ -5,6 +5,7 @@ import com.comfyui.common.entity.ComfyWorkFlow;
 import com.comfyui.common.entity.ComfyWorkFlowNode;
 import com.comfyui.queue.common.DrawingTaskInfo;
 import com.comfyui.queue.common.IDrawingTaskSubmit;
+import com.mashiro.config.comfyUi.WorkflowNodeConfig;
 import com.mashiro.dto.DrawDto;
 import com.mashiro.entity.DrawRecord;
 import com.mashiro.enums.BaseFlowWork;
@@ -18,8 +19,6 @@ import com.mashiro.service.DrawService;
 import com.mashiro.service.FileService;
 import com.mashiro.utils.ComfyUi.ComfyUiProperties;
 import com.mashiro.utils.TaskProcessMonitor.TaskProcessMonitor;
-import com.mashiro.config.comfyUi.WorkflowNodeConfig;
-import com.mashiro.service.impl.BaseDrawService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ResourceLoader;
@@ -239,8 +238,8 @@ public class DrawServiceImpl extends BaseDrawService implements DrawService {
     /**
      * 预处理文生图工作流
      */
-    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork, String prompt, 
-            Checkpoint checkpoint, ImageSize imageSize) {
+    private ComfyWorkFlow prepareWorkFlow(BaseFlowWork baseFlowWork, String prompt,
+                                          Checkpoint checkpoint, ImageSize imageSize) {
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
@@ -268,7 +267,7 @@ public class DrawServiceImpl extends BaseDrawService implements DrawService {
 
         // 配置随机种子
         configureRandomSeed(flow, nodeConfig);
-        
+
         log.info("获取修改后的文生图工作流: {}", flow);
         return flow;
     }
@@ -276,8 +275,8 @@ public class DrawServiceImpl extends BaseDrawService implements DrawService {
     /**
      * 预处理图生图工作流
      */
-    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork, 
-            String uploadedImagePath, String prompt, Checkpoint checkpoint) {
+    private ComfyWorkFlow prepareImg2ImgWorkFlow(BaseFlowWork baseFlowWork,
+                                                 String uploadedImagePath, String prompt, Checkpoint checkpoint) {
         ComfyWorkFlow flow = getFlow(baseFlowWork.toString());
         if (flow == null) {
             throw new DrawException(ResultCodeEnum.SERVICE_ERROR);
@@ -299,7 +298,7 @@ public class DrawServiceImpl extends BaseDrawService implements DrawService {
 
         // 配置随机种子
         configureRandomSeed(flow, nodeConfig);
-        
+
         // 替换工作流里面的默认提示词
         ComfyWorkFlowNode promptNode = flow.getNode(nodeConfig.getPositiveId());
         if (promptNode != null) {
@@ -368,10 +367,10 @@ public class DrawServiceImpl extends BaseDrawService implements DrawService {
     protected void submitDrawingTask(ComfyWorkFlow flow, String taskId) throws InterruptedException {
         // 清理可能存在的旧状态
         taskProcessMonitor.clearTaskStatus(taskId);
-        
+
         DrawingTaskInfo drawingTaskInfo = new DrawingTaskInfo(taskId, flow, TASK_TIMEOUT, TimeUnit.MINUTES);
         taskSubmit.submit(drawingTaskInfo);
-        
+
         // 等待任务完成或超时
         boolean completed = taskProcessMonitor.waitForCompletion(taskId, TASK_TIMEOUT, TimeUnit.MINUTES);
         if (!completed) {
