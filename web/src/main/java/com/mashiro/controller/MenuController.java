@@ -27,8 +27,9 @@ public class MenuController {
     @GetMapping("list")
     @Operation(summary = "获取菜单列表")
     public Result listMenu() {
-        List<Menu> list = menuService.list();
-        return Result.ok(list);
+        List<Menu> menus = menuService.queryListMenu();
+//        List<Menu> list = menuService.list();
+        return Result.ok(menus);
     }
 
     /**
